@@ -30,6 +30,8 @@ import pacman.game.comms.Messenger;
 import pacman.game.internal.POType;
 import pacman.game.util.Stats;
 
+import  PacMans.Constants;
+
 /**
  * This class may be used to execute the game in timed or un-timed modes, with or without
  * visuals. Competitors should implement their controllers in game.entries.ghosts and
@@ -615,7 +617,94 @@ public class Executor {
     public QLearner runGameQtrain(GhostController ghostController, int partidas) {
         Game game = setupGame();
         MOVE actMove;
-        QLearner learner = new QLearner(game.getNumberOfActivePills(), 4);
+        QLearner learner = new QLearner(game.getNumberOfActivePills()  , Constants.numMoves);
+        QPacMan qPacMan = new QPacMan(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupGame();
+	        	qPacMan.setNewGame(game);
+	        }	
+        }
+        return learner;   
+    }
+    public QLearner runGameQtrain2(GhostController ghostController, int partidas) {
+        Game game = setupGame();
+        MOVE actMove;
+        QLearner learner = new QLearner((Constants.maxDistance+2)*(Constants.maxDistance+2)   , Constants.numMoves);
+        QPacMan qPacMan = new QPacMan(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupGame();
+	        	qPacMan.setNewGame(game);
+	        }	
+        }
+        return learner;   
+    }
+    public QLearner runGameQtrain3(GhostController ghostController, int partidas) {  //en cuenta distancia a ghost, distancia a pill,edible o chasing 
+        Game game = setupGame();
+        MOVE actMove;
+        QLearner learner = new QLearner(((Constants.maxDistance+1)*(Constants.maxDistance+1) )*2  , Constants.numMoves);
+        QPacMan qPacMan = new QPacMan(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupGame();
+	        	qPacMan.setNewGame(game);
+	        }	
+        }
+        return learner;   
+    }
+    public QLearner runGameQtrain4(GhostController ghostController, int partidas) {
+        Game game = setupGame();
+        MOVE actMove;
+        QLearner learner = new QLearner((Constants.maxDistance+1)*(Constants.maxDistance+1) + (Constants.maxDistance+1)  , Constants.numMoves);
         QPacMan qPacMan = new QPacMan(learner);
         qPacMan.setNewGame(game);
 
