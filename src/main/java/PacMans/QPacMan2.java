@@ -43,18 +43,18 @@ public class QPacMan2 {
     		
     		if(distanceGhost== -1 ) {
     			if (distancePill ==-1) {
-    				this.lastJunctionState = (maxDistanceGhost+1) * (maxDistancePill+1) +(maxDistancePill +1) ;
+    				this.lastJunctionState = (maxDistanceGhost+1) * (maxDistancePill+2) +(maxDistancePill +1) ;
     			} 
     			else {
-    				this.lastJunctionState = (maxDistanceGhost+1) * (maxDistancePill+1) + distancePill ;
+    				this.lastJunctionState = (maxDistanceGhost+1) * (maxDistancePill+2) + distancePill ;
     			}
     		}
     		else if(distancePill == -1) {
-        		this.lastJunctionState = distanceGhost * (maxDistancePill +1)+ (maxDistancePill +1);
+        		this.lastJunctionState = distanceGhost * (maxDistancePill +2)+ (maxDistancePill +1);
 
     		}
     		else {
-        		this.lastJunctionState = distanceGhost * (maxDistancePill+1) + distancePill;
+        		this.lastJunctionState = distanceGhost * (maxDistancePill+2) + distancePill;
 
     		}
 	    	//1 pill-2m 
