@@ -22,7 +22,7 @@ public static void main(String[] args) {
 		GhostController ghosts = new GhostsAggresive();
 		
 		StringBuilder contentBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("model.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("model6.json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder.append(sCurrentLine).append("\n");
@@ -33,6 +33,6 @@ public static void main(String[] args) {
         }
 		
         QLearner learner = QLearner.fromJson(contentBuilder.toString());
-		System.out.println(executor.runGameQ(learner, ghosts, 40));
+		System.out.println(executor.runGameQ6(learner, ghosts, 40));
 	}
 }

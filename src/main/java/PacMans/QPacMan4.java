@@ -16,7 +16,7 @@ public class QPacMan4 {
     private QLearner agent;
     private MOVE lastJunctionMove;
     private int lastJunctionState;
-    private int nextJunctionState;
+    private int nextState;
 
     private final int[] REWARD = {-1000, -10000, -1000000, -10};
 
@@ -107,7 +107,6 @@ public class QPacMan4 {
     	else
     		reward = REWARD[1];
     	
-    	this.lastJunctionState = this.nextJunctionState;
     	
     	int msPacManNode = game.getPacmanCurrentNodeIndex();
 		MOVE msPacManMove = game.getPacmanLastMoveMade();
@@ -117,9 +116,12 @@ public class QPacMan4 {
 		int distanceChasingGhost = getDistanceNearestChasingGhost(msPacManNode, msPacManMove);
    		int distanceEdibleGhost = getDistanceNearestEdibleGhost(msPacManNode, msPacManMove);
 		
+   		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
+   			this.lastJunctionState = this.nextState;
+   		
 		calculateState(distanceChasingGhost, distanceEdibleGhost, distancePill);
 		
-    	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), game.getNumberOfActivePills(), reward);
+    	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, reward);
     }
     
     //Buscar los ghost no comibles problematicos

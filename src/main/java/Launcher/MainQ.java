@@ -16,7 +16,7 @@ public class MainQ {
 				.build();
 		
 		GhostController ghosts = new GhostsAggresive();
-		QLearner model = executor.runGameQtrain4(ghosts, 1000);
+		QLearner model = executor.runGameQtrain5(ghosts, 100);
 		
 		System.out.println(executor.runGameQ(model, ghosts, 40));
 	}

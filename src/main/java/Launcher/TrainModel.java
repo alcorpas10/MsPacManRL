@@ -18,9 +18,9 @@ public class TrainModel {
 				.build();
 		
 		GhostController ghosts = new GhostsAggresive();
-		QLearner model = executor.runGameQtrain4(ghosts, 1000);
+		QLearner model = executor.runGameQtrain6(ghosts, 1000);
 		
-		try(PrintStream ps = new PrintStream("model.json")){
+		try(PrintStream ps = new PrintStream("model6.json")){
             ps.println(model.toJson());
             ps.flush();
             ps.close();

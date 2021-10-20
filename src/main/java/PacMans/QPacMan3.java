@@ -17,6 +17,7 @@ public class QPacMan3 {
     private QLearner agent;
     private MOVE lastJunctionMove;
     private int lastJunctionState;
+    private int nextState;
 
     private final int[] REWARD = {-1000, -10000, -1000000, -10};
 
@@ -28,29 +29,22 @@ public class QPacMan3 {
     public void setNewGame(Game game) {
     	this.game = game;
     	this.lastJunctionMove = MOVE.LEFT;
-    	this.lastJunctionState = game.getNumberOfActivePills();
+    	
+    	int msPacManNode = game.getPacmanCurrentNodeIndex();
+		MOVE msPacManMove = game.getPacmanLastMoveMade();
+  		
+		int distancePill = getDistanceNearestPill(msPacManNode, msPacManMove);
+		Pair<Boolean, Integer> ghostData = getDistanceNearestGhost(msPacManNode, msPacManMove);
+		boolean edible = ghostData.getFirst();
+		int distanceGhost = ghostData.getSecond();
+    	
+    	calculateState(distanceGhost, distancePill, edible);
+
     }
 
     public MOVE act() {
     	if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
-      		int msPacManNode = game.getPacmanCurrentNodeIndex();
-    		MOVE msPacManMove = game.getPacmanLastMoveMade();
-      		
-    		int maxDistance = QConstants.maxDistance;
-    		int distancePill = getDistanceNearestPill(msPacManNode, msPacManMove);
-    		Pair<Boolean, Integer> ghostData = getDistanceNearestGhost(msPacManNode, msPacManMove);
-    		boolean edible = ghostData.getFirst();
-    		int distanceGhost = ghostData.getSecond();
-    		
-    		if (distanceGhost == -1)
-    			distanceGhost = maxDistance+1;
-    		if (distancePill == -1)
-    			distancePill = maxDistance+1;
-    		this.lastJunctionState = distanceGhost * (maxDistance+2) + distancePill;
-    		
-    		if (edible)
-    			this.lastJunctionState += (QConstants.maxDistance+2)*(QConstants.maxDistance+2);
-    		
+     
 	        MOVE[] possibleActions = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
 	        
 	        Set<Integer> possibleActionsSet = new HashSet<>();
@@ -83,6 +77,17 @@ public class QPacMan3 {
 		
     }
     
+    private void calculateState(int distanceGhost, int distancePill, boolean edible) {
+    	if (distanceGhost == -1)
+			distanceGhost = QConstants.maxDistance+1;
+		if (distancePill == -1)
+			distancePill = QConstants.maxDistance+1;
+		this.nextState = distanceGhost * (QConstants.maxDistance+2) + distancePill;
+		
+		if (edible)
+			this.nextState += (QConstants.maxDistance+2)*(QConstants.maxDistance+2);
+    }
+    
     /**
      * Basic strategy 
      */
@@ -104,7 +109,20 @@ public class QPacMan3 {
     		reward = REWARD[0];
     	else
     		reward = REWARD[1];
-    	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), game.getNumberOfActivePills(), reward);
+    	
+    	int msPacManNode = game.getPacmanCurrentNodeIndex();
+		MOVE msPacManMove = game.getPacmanLastMoveMade();
+  		
+		int distancePill = getDistanceNearestPill(msPacManNode, msPacManMove);
+		Pair<Boolean, Integer> ghostData = getDistanceNearestGhost(msPacManNode, msPacManMove);
+		boolean edible = ghostData.getFirst();
+		int distanceGhost = ghostData.getSecond();
+		
+		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
+			this.lastJunctionState = this.nextState;
+    	
+    	calculateState(distanceGhost, distancePill, edible);
+    	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, reward);
     }
     
     //Buscar los ghost no comibles problematicos
@@ -112,10 +130,13 @@ public class QPacMan3 {
   		int d = Integer.MAX_VALUE;
   		GHOST ghost = null;
   		for(GHOST g: GHOST.values()) { //miramos entre todos los ghosts
-  			int di = game.getShortestPathDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), msPacManMove);
-  			if(di != -1 && di < d) {
-  				d = di;
-  				ghost = g;
+  			int ghostNode = game.getGhostCurrentNodeIndex(g);
+  			if (ghostNode != game.getCurrentMaze().lairNodeIndex) {
+	  			int di = game.getShortestPathDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), msPacManMove);
+	  			if(di != -1 && di < d) {
+	  				d = di;
+	  				ghost = g;
+	  			}
   			}
   		}
   		if (d == Integer.MAX_VALUE)
