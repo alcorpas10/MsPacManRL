@@ -17,8 +17,6 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
-import com.github.chen0040.rl.models.QModel;
 
 import pacman.controllers.Controller;
 import pacman.controllers.GhostController;
@@ -31,6 +29,7 @@ import pacman.game.comms.BasicMessenger;
 import pacman.game.comms.Messenger;
 import pacman.game.internal.POType;
 import pacman.game.util.Stats;
+import PacMans.QPacMan;
 import PacMans.QPacMan2;
 import PacMans.QPacMan3;
 import PacMans.QPacMan4;
@@ -38,6 +37,7 @@ import PacMans.QPacMan5;
 import PacMans.QPacMan6;
 import PacMans.QPacMan7;
 import Utils.QConstants;
+import chen0040.rl.learning.qlearn.QLearner;
 
 /**
  * This class may be used to execute the game in timed or un-timed modes, with or without
@@ -1232,6 +1232,41 @@ public class Executor {
         
         MOVE actMove;
         QPacMan6 qPacMan = new QPacMan6(model);
+        qPacMan.setNewGame(game);
+        
+        GameView gv = (visuals) ? setupQGameView(game) : null;       
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        while (!game.gameOver()) {
+            if (tickLimit != -1 && tickLimit < game.getTotalTime())
+                break;
+            
+            handlePeek(game);
+            
+            actMove = qPacMan.act();
+            game.advanceGame(
+            		actMove,
+                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+            qPacMan.updateStrategy();   
+            
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
+            
+            if (visuals)
+                gv.repaint();
+        }
+        
+        return game.getScore();
+    }
+    
+    public int runGameQ7(QLearner model, GhostController ghostController, int delay) {
+        Game game = setupGame();
+        
+        MOVE actMove;
+        QPacMan7 qPacMan = new QPacMan7(model);
         qPacMan.setNewGame(game);
         
         GameView gv = (visuals) ? setupQGameView(game) : null;       

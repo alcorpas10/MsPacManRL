@@ -4,11 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
 
 import Utils.QConstants;
+import chen0040.rl.learning.qlearn.QLearner;
 import pacman.game.Game;
-import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 

@@ -2,17 +2,17 @@ package Launcher;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
 
 import Others.Executor;
 import Others.GhostRandom;
 import Others.GhostsAggresive;
+import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
 public class TrainModel {
 
 	public static void main(String[] args) {
-		String json = "model7Prueba.json";
+		String json = "model7.json";
 		System.out.println(json);
 		Executor executor = new Executor.Builder()
 				.setTickLimit(4000)

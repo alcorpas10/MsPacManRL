@@ -2,8 +2,7 @@ package PacMans;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
-
+import chen0040.rl.learning.qlearn.QLearner;
 import pacman.game.Game;
 import pacman.game.Constants.MOVE;
 

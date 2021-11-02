@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
-
 import Utils.Pair;
 import Utils.QConstants;
+import chen0040.rl.learning.qlearn.QLearner;
 import pacman.game.Game;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;

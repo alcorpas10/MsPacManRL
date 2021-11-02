@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
 
 import Others.Executor;
 import Others.GhostRandom;
+import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
 public class RunRandomModel {

@@ -6,10 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import com.github.chen0040.rl.learning.qlearn.QLearner;
-
 import Others.Executor;
 import Others.GhostsAggresive;
+import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
 public class LoadAndTrainModel {
