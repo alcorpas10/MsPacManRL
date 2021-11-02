@@ -8,14 +8,13 @@ import com.github.chen0040.rl.learning.qlearn.QLearner;
 
 import Others.Executor;
 import Others.GhostRandom;
-import Others.GhostsAggresive;
 import pacman.controllers.GhostController;
 
-public class RunModel {
+public class RunRandomModel {
 public static void main(String[] args) {
         
 		Executor executor = new Executor.Builder()
-				.setTickLimit(4000)
+				.setTickLimit(500)
 				.setVisual(true)
 				.setScaleFactor(3.0)
 				.build();
@@ -34,6 +33,6 @@ public static void main(String[] args) {
         }
 		
         QLearner learner = QLearner.fromJson(contentBuilder.toString());
-		System.out.println(executor.runGameQ6(learner, ghosts, 40));
+		System.out.println(executor.runRandomQGame(learner, ghosts, 40));
 	}
 }

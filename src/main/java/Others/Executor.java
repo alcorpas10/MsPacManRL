@@ -1198,4 +1198,43 @@ public class Executor {
         
         return game.getScore();
     }
+    
+    public int runRandomQGame(QLearner model, GhostController ghostController, int delay) {
+        Game game = setupRandomGame();
+        
+        MOVE actMove;
+        QPacMan6 qPacMan = new QPacMan6(model);
+        qPacMan.setNewGame(game);
+        
+        GameView gv = (visuals) ? setupQGameView(game) : null;       
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        while (!game.gameOver()) {
+            if (tickLimit != -1 && tickLimit < game.getTotalTime())
+                break;
+            
+            handlePeek(game);
+            
+            actMove = qPacMan.act();
+            game.advanceGame(
+            		actMove,
+                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+            qPacMan.updateStrategy();   
+            
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
+            
+            if (visuals)
+                gv.repaint();
+        }
+        
+        return game.getScore();
+    }
+
+	private Game setupRandomGame() {
+		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true);
+	}
 }
