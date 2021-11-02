@@ -36,6 +36,7 @@ import PacMans.QPacMan3;
 import PacMans.QPacMan4;
 import PacMans.QPacMan5;
 import PacMans.QPacMan6;
+import PacMans.QPacMan7;
 import Utils.QConstants;
 
 /**
@@ -800,6 +801,36 @@ public class Executor {
         return learner;   
     }
     
+    public QLearner runGameQtrain7(GhostController ghostController, int partidas) {
+        Game game = setupGame();
+        MOVE actMove;
+        QLearner learner = new QLearner(13333, QConstants.numMoves, 0.1, 0.7, 0.1); //2: isEdible, 4: direction Ghost and Pills, 4: Distance intervals
+        QPacMan7 qPacMan = new QPacMan7(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupGame();
+	        	qPacMan.setNewGame(game);
+	        }	
+        }
+        return learner;   
+    }
+    
     public QLearner runGameLoadQtrain(String model, GhostController ghostController, int partidas) {
         Game game = setupGame();
         MOVE actMove;
@@ -979,6 +1010,38 @@ public class Executor {
         }
         return learner;   
     }
+    
+    public QLearner runGameLoadQtrain7(String model, GhostController ghostController, int partidas) {
+        Game game = setupGame();
+        MOVE actMove;
+        QLearner learner = QLearner.fromJson(model);
+        QPacMan7 qPacMan = new QPacMan7(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupGame();
+	        	qPacMan.setNewGame(game);
+	        }	
+        }
+        return learner;   
+    }
+    
+    
     
     private GameView setupQGameView(Game game) {
         GameView gv;

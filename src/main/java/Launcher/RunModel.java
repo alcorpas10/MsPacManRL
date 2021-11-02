@@ -34,6 +34,6 @@ public static void main(String[] args) {
         }
 		
         QLearner learner = QLearner.fromJson(contentBuilder.toString());
-		System.out.println(executor.runGameQ6(learner, ghosts, 40));
+		System.out.println(executor.runGameQ7(learner, ghosts, 40));
 	}
 }

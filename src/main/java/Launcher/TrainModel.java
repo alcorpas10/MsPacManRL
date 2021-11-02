@@ -12,6 +12,8 @@ import pacman.controllers.GhostController;
 public class TrainModel {
 
 	public static void main(String[] args) {
+		String json = "model7Prueba.json";
+		System.out.println(json);
 		Executor executor = new Executor.Builder()
 				.setTickLimit(4000)
 				.setVisual(true)
@@ -19,9 +21,9 @@ public class TrainModel {
 				.build();
 		
 		GhostController ghosts = new GhostRandom();
-		QLearner model = executor.runGameQtrain6(ghosts, 100000);
+		QLearner model = executor.runGameQtrain7(ghosts, 10);
 		
-		try(PrintStream ps = new PrintStream("model6Random.json")){
+		try(PrintStream ps = new PrintStream(json)){
             ps.println(model.toJson());
             ps.flush();
             ps.close();
@@ -29,5 +31,4 @@ public class TrainModel {
             e.printStackTrace();
         }
 	}
-
 }
