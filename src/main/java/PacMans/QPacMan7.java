@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import Utils.Pair;
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
 import pacman.game.Game;

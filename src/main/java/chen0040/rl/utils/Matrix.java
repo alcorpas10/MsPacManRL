@@ -33,7 +33,31 @@ public class Matrix implements Serializable {
         }
     }
     
-    public int getRowCount() {
+    public Map<Integer, Vec> getRows() {
+		return rows;
+	}
+
+	public void setRows(Map<Integer, Vec> rows) {
+		this.rows = rows;
+	}
+
+	public double getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(double defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
+	public void setRowCount(int rowCount) {
+		this.rowCount = rowCount;
+	}
+
+	public void setColumnCount(int columnCount) {
+		this.columnCount = columnCount;
+	}
+
+	public int getRowCount() {
 		return rowCount;
 	}
 

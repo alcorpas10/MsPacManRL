@@ -4,12 +4,13 @@ package chen0040.rl.learning.qlearn;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.github.chen0040.rl.actionselection.AbstractActionSelectionStrategy;
-import com.github.chen0040.rl.actionselection.ActionSelectionStrategy;
-import com.github.chen0040.rl.actionselection.ActionSelectionStrategyFactory;
-import com.github.chen0040.rl.actionselection.EpsilonGreedyActionSelectionStrategy;
-import com.github.chen0040.rl.models.QModel;
 import com.github.chen0040.rl.utils.IndexValue;
+
+import chen0040.rl.actionselection.AbstractActionSelectionStrategy;
+import chen0040.rl.actionselection.ActionSelectionStrategy;
+import chen0040.rl.actionselection.ActionSelectionStrategyFactory;
+import chen0040.rl.actionselection.EpsilonGreedyActionSelectionStrategy;
+import chen0040.rl.models.QModel;
 
 import java.io.Serializable;
 import java.util.Random;

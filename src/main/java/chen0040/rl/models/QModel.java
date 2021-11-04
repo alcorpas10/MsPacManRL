@@ -2,8 +2,9 @@ package chen0040.rl.models;
 
 
 import com.github.chen0040.rl.utils.IndexValue;
-import com.github.chen0040.rl.utils.Matrix;
 import com.github.chen0040.rl.utils.Vec;
+
+import chen0040.rl.utils.Matrix;
 
 import java.util.*;
 
@@ -81,9 +82,41 @@ public class QModel {
         actionCount = rhs.actionCount;
         Q = rhs.Q==null ? null : rhs.Q.makeCopy();
         alphaMatrix = rhs.alphaMatrix == null ? null : rhs.alphaMatrix.makeCopy();
-    }
+    }    
+    
+    public void setQ(Matrix q) {
+		Q = q;
+	}
 
-    public double getGamma() {
+	public void setAlphaMatrix(Matrix alphaMatrix) {
+		this.alphaMatrix = alphaMatrix;
+	}
+
+	public void setStateCount(int stateCount) {
+		this.stateCount = stateCount;
+	}
+
+	public void setActionCount(int actionCount) {
+		this.actionCount = actionCount;
+	}
+
+	public Matrix getQ() {
+		return Q;
+	}
+
+	public Matrix getAlphaMatrix() {
+		return alphaMatrix;
+	}
+
+	public int getStateCount() {
+		return stateCount;
+	}
+
+	public int getActionCount() {
+		return actionCount;
+	}
+
+	public double getGamma() {
 		return gamma;
 	}
 
