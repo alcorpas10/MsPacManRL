@@ -803,7 +803,7 @@ public class Executor {
     public QLearner runGameQtrain7(GhostController ghostController, int partidas) {
         Game game = setupGame();
         MOVE actMove;
-        QLearner learner = new QLearner(13333, QConstants.numMoves, 10, 0.7, 0.1); //2: isEdible, 4: direction Ghost and Pills, 4: Distance intervals
+        QLearner learner = new QLearner(13333, QConstants.numMoves, 0.1, 0.7, 0.1); //2: isEdible, 4: direction Ghost and Pills, 4: Distance intervals
         QPacMan7 qPacMan = new QPacMan7(learner);
         qPacMan.setNewGame(game);
 
