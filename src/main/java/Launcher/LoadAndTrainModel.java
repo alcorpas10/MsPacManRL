@@ -20,7 +20,7 @@ public class LoadAndTrainModel {
 				.build();
 		
 		StringBuilder contentBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("model.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(args[0]))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder.append(sCurrentLine).append("\n");
@@ -31,9 +31,9 @@ public class LoadAndTrainModel {
         }
 		
 		GhostController ghosts = new GhostsAggresive();
-		QLearner model = executor.runGameLoadQtrain4(contentBuilder.toString(), ghosts, 10000);
+		QLearner model = executor.runGameLoadQtrain4(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
 		
-		try(PrintStream ps = new PrintStream("model.json")){
+		try(PrintStream ps = new PrintStream(args[0])){
             ps.println(model.toJson());
             ps.flush();
             ps.close();

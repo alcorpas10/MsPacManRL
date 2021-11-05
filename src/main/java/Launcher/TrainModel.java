@@ -5,15 +5,13 @@ import java.io.PrintStream;
 
 import Others.Executor;
 import Others.GhostRandom;
-import Others.GhostsAggresive;
 import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
 public class TrainModel {
 
 	public static void main(String[] args) {
-		String json = "model7-10-0.7.json";
-		System.out.println(json);
+		System.out.println(args[0]);
 		Executor executor = new Executor.Builder()
 				.setTickLimit(4000)
 				.setVisual(true)
@@ -21,9 +19,9 @@ public class TrainModel {
 				.build();
 		
 		GhostController ghosts = new GhostRandom();
-		QLearner model = executor.runGameQtrain7(ghosts, 100000);
+		QLearner model = executor.runGameQtrain7(ghosts, Integer.parseInt(args[1]));
 		
-		try(PrintStream ps = new PrintStream(json)){
+		try(PrintStream ps = new PrintStream(args[0])){
             ps.println(model.toJson());
             ps.flush();
             ps.close();

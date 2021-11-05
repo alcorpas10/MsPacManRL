@@ -22,7 +22,7 @@ public static void main(String[] args) {
 		GhostController ghosts = new GhostRandom();
 		
 		StringBuilder contentBuilder = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("model6Random.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(args[0]))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder.append(sCurrentLine).append("\n");
