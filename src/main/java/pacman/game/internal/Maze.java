@@ -46,7 +46,7 @@ public final class Maze {
         String[] pr = input.split("\t");
 
         this.name = pr[0];
-        this.initialPacManNodeIndex = Integer.parseInt(pr[1]);
+        this.initialPacManNodeIndex = /*(int)(Math.random()*(double)Integer.parseInt(pr[4]));*/Integer.parseInt(pr[1]);
         this.lairNodeIndex = Integer.parseInt(pr[2]);
         this.initialGhostNodeIndex = Integer.parseInt(pr[3]);
         this.graph = new Node[Integer.parseInt(pr[4])];

@@ -1,10 +1,5 @@
 package pacman.game.internal;
 
-import static pacman.game.Constants.NUM_LIVES;
-
-import java.util.Random;
-
-import pacman.game.Game;
 import pacman.game.Constants.MOVE;
 
 /*
@@ -21,15 +16,6 @@ public final class PacMan {
         this.lastDir = this.lastMoveMade = lastMoveMade;
         this.numberOfLivesRemaining = numberOfLivesRemaining;
         this.hasReceivedExtraLife = hasReceivedExtraLife;
-    }
-    
-    public PacMan(Maze maze, Game game) {
-    	Random rnd = new Random();
-        this.currentNodeIndex = maze.graph[rnd.nextInt(maze.graph.length)].nodeIndex;
-        this.numberOfLivesRemaining = 1; //rnd.nextInt(NUM_LIVES);
-        MOVE[] moves = game.getPossibleMoves(this.currentNodeIndex);
-        this.lastDir = this.lastMoveMade = moves[rnd.nextInt(moves.length)];
-        this.hasReceivedExtraLife = false;
     }
 
     public PacMan copy() {
