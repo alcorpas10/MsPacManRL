@@ -855,7 +855,9 @@ public class Executor {
 	        if(i != partidas -1) {
 	        	game = setupRandomGame();
 	        	qPacMan.setNewGame(game);
-	        }	
+	        }
+	        if (i % 5000 == 0)
+	        	System.out.println("Partida " + i);
         }
         return learner;   
     }

@@ -125,74 +125,92 @@ public class QPacMan7 {
      * Basic strategy 
      */
     public void updateStrategy() {
-    	int reward;
-    	boolean eatenGhost = false;
-    	for (GHOST g: GHOST.values()) {
-    		if (game.wasGhostEaten(g)) {
-    			eatenGhost = true;
-    			break;
+    	int msPacManNode = -1;
+    	MOVE msPacManMove = null;
+    	int pillNode = -1;
+    	int distancePill = -1;
+    	GHOST ghost = null;
+    	int distanceGhost = -1;
+    	int ghostNode = -1;
+    	try {
+    		int reward;
+        	boolean eatenGhost = false;
+        	for (GHOST g: GHOST.values()) {
+        		if (game.wasGhostEaten(g)) {
+        			eatenGhost = true;
+        			break;
+        		}
+        	}
+        	
+        	if (game.wasPacManEaten())
+        		reward = REWARD[2];
+        	else if (eatenGhost)
+        		reward = REWARD[3];
+        	else if (game.wasPillEaten())
+        		reward = REWARD[0];
+        	else
+        		reward = REWARD[1];
+        	
+        	msPacManNode = game.getPacmanCurrentNodeIndex();
+    		msPacManMove = game.getPacmanLastMoveMade();
+      		
+    		pillNode = getNearestPill(msPacManNode, msPacManMove);
+    		distancePill = game.getShortestPathDistance(msPacManNode, pillNode);
+    		ghost = getNearestGhost(msPacManNode, msPacManMove);
+    		boolean edible = false;
+    		MOVE directionGhost = MOVE.UP, directionPill = game.getNextMoveTowardsTarget(msPacManNode, pillNode, msPacManMove, DM.PATH);;
+    		
+    		
+    		if(ghost != null) {
+    			edible = game.isGhostEdible(ghost);
+    			
+    			ghostNode = game.getGhostCurrentNodeIndex(ghost);
+    			
+    			if(edible) {
+    				distanceGhost = game.getShortestPathDistance(msPacManNode, ghostNode, msPacManMove);
+    				directionGhost = game.getNextMoveTowardsTarget(msPacManNode, ghostNode, msPacManMove, DM.PATH);
+    			}
+    			else {
+    				distanceGhost = game.getShortestPathDistance(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost));
+    				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
+    			}
+    			
+    			if(distanceGhost <= 20 )
+    				distanceGhost = 0;
+    			else if(distanceGhost <= 50)
+    				distanceGhost = 1;
+    			else if(distanceGhost <= 90)
+    				distanceGhost = 2;
+    			else
+    				distanceGhost = 3;
     		}
+    		
+    		if(distancePill <= 20 && distancePill >= 0)
+    			distancePill = 0;
+    		else if(distancePill <= 50)
+    			distancePill = 1;
+    		else if(distancePill <= 90)
+    			distancePill = 2;
+    		else
+    			distancePill = 3;
+    		
+    		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
+    			this.lastJunctionState = this.nextState;
+    		
+        	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
+        	
+        	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
+    	} catch(Exception e) {
+    		System.out.println("MsNode: " + msPacManNode);
+    		System.out.println("MsMove: " + msPacManMove);
+    		System.out.println("NumPills: " + game.getNumberOfActivePills());
+    		System.out.println("PillNode: " + pillNode);
+    		System.out.println("PillDtnce: " + distancePill);
+    		System.out.println("Ghost: " + ghost);
+    		System.out.println("GhostNode: " + ghostNode);
+    		System.out.println("GhostDtnce: " + distanceGhost);
+    		System.out.println(game.getGameState());
     	}
-    	
-    	if (game.wasPacManEaten())
-    		reward = REWARD[2];
-    	else if (eatenGhost)
-    		reward = REWARD[3];
-    	else if (game.wasPillEaten())
-    		reward = REWARD[0];
-    	else
-    		reward = REWARD[1];
-    	
-    	int msPacManNode = game.getPacmanCurrentNodeIndex();
-		MOVE msPacManMove = game.getPacmanLastMoveMade();
-  		
-		int pillNode = getNearestPill(msPacManNode, msPacManMove);
-		int distancePill = game.getShortestPathDistance(msPacManNode, pillNode);
-		GHOST ghost = getNearestGhost(msPacManNode, msPacManMove);
-		boolean edible = false;
-		int distanceGhost = 4;
-		MOVE directionGhost = MOVE.UP, directionPill = game.getNextMoveTowardsTarget(msPacManNode, pillNode, msPacManMove, DM.PATH);;
-		
-		
-		if(ghost != null) {
-			edible = game.isGhostEdible(ghost);
-			
-			int ghostNode = game.getGhostCurrentNodeIndex(ghost);
-			
-			if(edible) {
-				distanceGhost = game.getShortestPathDistance(msPacManNode, ghostNode, msPacManMove);
-				directionGhost = game.getNextMoveTowardsTarget(msPacManNode, ghostNode, msPacManMove, DM.PATH);
-			}
-			else {
-				distanceGhost = game.getShortestPathDistance(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost));
-				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
-			}
-			
-			if(distanceGhost <= 20 )
-				distanceGhost = 0;
-			else if(distanceGhost <= 50)
-				distanceGhost = 1;
-			else if(distanceGhost <= 90)
-				distanceGhost = 2;
-			else
-				distanceGhost = 3;
-		}
-		
-		if(distancePill <= 20 && distancePill >= 0)
-			distancePill = 0;
-		else if(distancePill <= 50)
-			distancePill = 1;
-		else if(distancePill <= 90)
-			distancePill = 2;
-		else
-			distancePill = 3;
-		
-		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
-			this.lastJunctionState = this.nextState;
-		
-    	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
-    	
-    	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
     }
     
     //Buscar los ghost no comestibles problematicos

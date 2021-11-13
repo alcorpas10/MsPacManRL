@@ -366,7 +366,7 @@ public final class Game {
         
         MOVE[] poss = this.getPossibleMoves(initialNode);
         MOVE init = MOVE.NEUTRAL;
-        internalPacman = new PacMan(initialNode, init, NUM_LIVES, false);
+        internalPacman = new PacMan(initialNode, init, 1, false);
         
     }
     private void setRandomPills() {
