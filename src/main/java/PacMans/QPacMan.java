@@ -1,20 +1,27 @@
 package PacMans;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
+import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
 import pacman.game.Game;
+import pacman.game.Constants.DM;
+import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
 public class QPacMan {
     private Game game;
-    private final QLearner agent;
+    private QLearner agent;
     private MOVE lastJunctionMove;
     private int lastJunctionState;
+    private int nextState;
 
-    private final int[] REWARD = {-100, -10000};
+    private final int[] REWARD = {1000, -100, -1000000, 100000};
 
-    
+
     public QPacMan(QLearner learner) {
 		this.agent = learner;
     }
@@ -22,15 +29,59 @@ public class QPacMan {
     public void setNewGame(Game game) {
     	this.game = game;
     	this.lastJunctionMove = MOVE.LEFT;
-    	this.lastJunctionState = game.getNumberOfActivePills();
+    	
+    	int msPacManNode = game.getPacmanCurrentNodeIndex();
+		MOVE msPacManMove = game.getPacmanLastMoveMade();
+  		
+		int pillNode = getNearestPill(msPacManNode, msPacManMove);
+		int distancePill = game.getShortestPathDistance(msPacManNode, pillNode);
+		GHOST ghost = getNearestGhost(msPacManNode, msPacManMove);
+		boolean edible = false;
+		int distanceGhost = 4;
+		MOVE directionGhost = MOVE.UP, directionPill = game.getNextMoveTowardsTarget(msPacManNode, pillNode, msPacManMove, DM.PATH);;
+		
+		
+		if(ghost != null) {
+			edible = game.isGhostEdible(ghost);
+			
+			int ghostNode = game.getGhostCurrentNodeIndex(ghost);
+			
+			if(edible) {
+				distanceGhost = game.getShortestPathDistance(msPacManNode, ghostNode, msPacManMove);
+				directionGhost = game.getNextMoveTowardsTarget(msPacManNode, ghostNode, msPacManMove, DM.PATH);
+			}
+			else {
+				distanceGhost = game.getShortestPathDistance(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost));
+				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
+			}
+			
+			if(distanceGhost <= 20 )
+				distanceGhost = 0;
+			else if(distanceGhost <= 50)
+				distanceGhost = 1;
+			else if(distanceGhost <= 90)
+				distanceGhost = 2;
+			else
+				distanceGhost = 3;
+		}
+		
+		if(distancePill <= 20 && distancePill >= 0)
+			distancePill = 0;
+		else if(distancePill <= 50)
+			distancePill = 1;
+		else if(distancePill <= 90)
+			distancePill = 2;
+		else
+			distancePill = 3;
+		
+		
+    	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
+
     }
 
     public MOVE act() {
-    	
     	if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
-    		this.lastJunctionState = game.getNumberOfActivePills();
-	    	
-	
+     
 	        MOVE[] possibleActions = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
 	        
 	        Set<Integer> possibleActionsSet = new HashSet<>();
@@ -40,7 +91,6 @@ public class QPacMan {
 	
 	        if(!possibleActionsSet.isEmpty()) {
 	        	int action = agent.selectAction(lastJunctionState, possibleActionsSet).getIndex();
-	
 	            switch(action) {
 	    		case 0:
 	    			this.lastJunctionMove = MOVE.UP;
@@ -63,10 +113,147 @@ public class QPacMan {
     	return MOVE.NEUTRAL;
 		
     }
-    public void updateStrategy() {
-    	int reward = (game.wasPillEaten())? REWARD[0] : REWARD[1];
-    	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), game.getNumberOfActivePills(), reward);
+    
+    private void calculateState(int distanceGhost, int distancePill, boolean edible, MOVE directionGhost, MOVE directionPill) {
+		
+    	int edibleInt =(edible)? 1:0;
+    	
+    	this.nextState = edibleInt*10000 + directionGhost.ordinal()*1000 + directionPill.ordinal()*100 + distanceGhost*10 + distancePill;
     }
-
+    
+    /**
+     * Basic strategy 
+     */
+    public void updateStrategy() {
+    	int msPacManNode = -1;
+    	MOVE msPacManMove = null;
+    	int pillNode = -1;
+    	int distancePill = -1;
+    	GHOST ghost = null;
+    	int distanceGhost = -1;
+    	int ghostNode = -1;
+    	try {
+    		int reward;
+        	boolean eatenGhost = false;
+        	for (GHOST g: GHOST.values()) {
+        		if (game.wasGhostEaten(g)) {
+        			eatenGhost = true;
+        			break;
+        		}
+        	}
+        	
+        	if (game.wasPacManEaten())
+        		reward = REWARD[2];
+        	else if (eatenGhost)
+        		reward = REWARD[3];
+        	else if (game.wasPillEaten())
+        		reward = REWARD[0];
+        	else
+        		reward = REWARD[1];
+        	
+        	msPacManNode = game.getPacmanCurrentNodeIndex();
+    		msPacManMove = game.getPacmanLastMoveMade();
+      		
+    		pillNode = getNearestPill(msPacManNode, msPacManMove);
+    		distancePill = game.getShortestPathDistance(msPacManNode, pillNode);
+    		ghost = getNearestGhost(msPacManNode, msPacManMove);
+    		boolean edible = false;
+    		MOVE directionGhost = MOVE.UP, directionPill = game.getNextMoveTowardsTarget(msPacManNode, pillNode, msPacManMove, DM.PATH);;
+    		
+    		
+    		if(ghost != null) {
+    			edible = game.isGhostEdible(ghost);
+    			
+    			ghostNode = game.getGhostCurrentNodeIndex(ghost);
+    			
+    			if(edible) {
+    				distanceGhost = game.getShortestPathDistance(msPacManNode, ghostNode, msPacManMove);
+    				directionGhost = game.getNextMoveTowardsTarget(msPacManNode, ghostNode, msPacManMove, DM.PATH);
+    			}
+    			else {
+    				distanceGhost = game.getShortestPathDistance(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost));
+    				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
+    			}
+    			
+    			if(distanceGhost <= 20 )
+    				distanceGhost = 0;
+    			else if(distanceGhost <= 50)
+    				distanceGhost = 1;
+    			else if(distanceGhost <= 90)
+    				distanceGhost = 2;
+    			else
+    				distanceGhost = 3;
+    		}
+    		
+    		if(distancePill <= 20 && distancePill >= 0)
+    			distancePill = 0;
+    		else if(distancePill <= 50)
+    			distancePill = 1;
+    		else if(distancePill <= 90)
+    			distancePill = 2;
+    		else
+    			distancePill = 3;
+    		
+    		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
+    			this.lastJunctionState = this.nextState;
+    		
+        	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
+        	
+        	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
+    	} catch(Exception e) {
+    		System.out.println("MsNode: " + msPacManNode);
+    		System.out.println("MsMove: " + msPacManMove);
+    		System.out.println("NumPills: " + game.getNumberOfActivePills());
+    		System.out.println("PillNode: " + pillNode);
+    		System.out.println("PillDtnce: " + distancePill);
+    		System.out.println("Ghost: " + ghost);
+    		System.out.println("GhostNode: " + ghostNode);
+    		System.out.println("GhostDtnce: " + distanceGhost);
+    		System.out.println(game.getGameState());
+    	}
+    }
+    
+    //Buscar los ghost no comestibles problematicos
+  	private GHOST getNearestGhost(int msPacManNode, MOVE msPacManMove) {
+  		int d = Integer.MAX_VALUE;
+  		GHOST ghost = null;
+  		for(GHOST g: GHOST.values()) { //miramos entre todos los ghosts
+  			int ghostNode = game.getGhostCurrentNodeIndex(g);
+  			if (ghostNode != game.getCurrentMaze().lairNodeIndex) {
+	  			int di = game.getShortestPathDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), msPacManMove);
+	  			if(di != -1 && di < d) {
+	  				d = di;
+	  				ghost = g;
+	  			}
+  			}
+  		}
+  		if (d == Integer.MAX_VALUE)
+  			return null;
+  		return ghost;
+  	}
+  	
+  	//Metodo que obtiene la pill mas cercana y en caso de haber varias a la misma distancia obtiene la direccion a una
+  	//de ellas de forma pseudoaleatoria
+  	private int getNearestPill(int msPacManNode, MOVE msPacManMove) {
+  		int[] pillsArray = game.getActivePillsIndices();
+  		List<Integer> nearestPills = new ArrayList<Integer>();
+  		double distance, minDistance = Double.MAX_VALUE;
+  		for (int pill : pillsArray) {
+  			distance = game.getShortestPathDistance(msPacManNode, pill, msPacManMove);
+  			if(distance == minDistance)
+  				nearestPills.add(pill);
+  			else if( distance < minDistance) {
+  				minDistance = distance;
+  				nearestPills.clear();
+  				nearestPills.add(pill);
+  			}
+  		}
+  		if (nearestPills.isEmpty())
+  			return -1;
+  		else {
+  			Random rnd = new Random();
+  			return nearestPills.get(rnd.nextInt(nearestPills.size()));
+  		}
+  	}
 }
 

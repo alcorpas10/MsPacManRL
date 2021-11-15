@@ -31,7 +31,7 @@ public class LoadAndTrainModel {
         }
 		
 		GhostController ghosts = new GhostsAggresive();
-		QLearner model = executor.runGameLoadQtrain7Random(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
+		QLearner model = executor.runGameLoadQtrainRandom(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
 		
 		try(PrintStream ps = new PrintStream(args[0])){
             ps.println(model.toJson());
