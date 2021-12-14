@@ -7,12 +7,13 @@ import java.util.Set;
 
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
+import es.ucm.fdi.ici.Action;
 import pacman.game.Game;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
-public class QPacMan {
+public class QPacManFlee extends QPacMan{
     private Game game;
     private QLearner agent;
     private MOVE lastJunctionMove;
@@ -22,7 +23,7 @@ public class QPacMan {
     //private final int[] REWARD = {1000, -100, -1000000, 100000};
     private final int[] REWARD = {-10000, 10};
 
-    public QPacMan(QLearner learner) {
+    public QPacManFlee(QLearner learner) {
 		this.agent = learner;
     }
     
@@ -121,10 +122,6 @@ public class QPacMan {
     	this.nextState = edibleInt*10000 + directionGhost.ordinal()*1000 + directionPill.ordinal()*100 + distanceGhost*10 + distancePill;
     }*/
     private void calculateState(int distanceGhost, int distancePill, boolean edible, MOVE directionGhost, MOVE directionPill) {
-		
-    	if(edible)
-    		System.out.println("Edible");
-    	
     	this.nextState = directionGhost.ordinal()*1000 +  + distanceGhost*10;
     }
     /**
@@ -347,5 +344,17 @@ public class QPacMan {
   			return nearestPills.get(rnd.nextInt(nearestPills.size()));
   		}
   	}
+
+	@Override
+	public String getActionId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MOVE execute(Game game) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
 

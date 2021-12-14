@@ -7,12 +7,13 @@ import java.util.Set;
 
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
+import es.ucm.fdi.ici.Action;
 import pacman.game.Game;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
-public class QPacMan {
+public class QPacManOriginal extends QPacMan{
     private Game game;
     private QLearner agent;
     private MOVE lastJunctionMove;
@@ -22,7 +23,7 @@ public class QPacMan {
     private final int[] REWARD = {1000, -100, -1000000, 100000};
 
 
-    public QPacMan(QLearner learner) {
+    public QPacManOriginal(QLearner learner) {
 		this.agent = learner;
     }
     
@@ -255,5 +256,47 @@ public class QPacMan {
   			return nearestPills.get(rnd.nextInt(nearestPills.size()));
   		}
   	}
+
+	@Override
+	public String getActionId() {
+		// TODO Auto-generated method stub
+		return "Original Action";
+	}
+
+	@Override
+	public MOVE execute(Game game) {
+		// TODO Auto-generated method stub
+		if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+		     
+	        MOVE[] possibleActions = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
+	        
+	        Set<Integer> possibleActionsSet = new HashSet<>();
+	        
+	        for(MOVE a: possibleActions)
+	        	possibleActionsSet.add(a.ordinal());
+	
+	        if(!possibleActionsSet.isEmpty()) {
+	        	int action = agent.selectAction(lastJunctionState, possibleActionsSet).getIndex();
+	            switch(action) {
+	    		case 0:
+	    			this.lastJunctionMove = MOVE.UP;
+	    			break;
+	    		case 1:
+	    			this.lastJunctionMove = MOVE.RIGHT;
+	    			break;
+	    		case 2:
+	    			this.lastJunctionMove = MOVE.DOWN;
+	    			break;
+	    		case 3:
+	    			this.lastJunctionMove = MOVE.LEFT;
+	    			break;
+	    		default:
+	    			this.lastJunctionMove = MOVE.NEUTRAL;
+	            }     
+	        }
+	        return this.lastJunctionMove;
+    	}
+    	return MOVE.NEUTRAL;
+	}
 }
 

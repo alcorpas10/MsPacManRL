@@ -16,7 +16,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import FSM.MsPacMan;
 import pacman.controllers.Controller;
 import pacman.controllers.GhostController;
 import pacman.controllers.HumanController;
@@ -29,7 +29,8 @@ import pacman.game.comms.Messenger;
 import pacman.game.internal.POType;
 import pacman.game.util.Stats;
 import PacMans.QPacMan;
-import PacMans.QPacManAlex;
+import PacMans.QPacManOriginal;
+import PacMans.QPacManPills;
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
 
@@ -623,7 +624,7 @@ public class Executor {
         Game game = setupGame();
         MOVE actMove;
         QLearner learner = new QLearner(13333, QConstants.numMoves, 0.1, 0.7, 0.1); //2: isEdible, 4: direction Ghost and Pills, 4: Distance intervals
-        QPacMan qPacMan = new QPacMan(learner);
+        QPacMan qPacMan = new QPacManOriginal(learner);
         qPacMan.setNewGame(game);
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -653,7 +654,7 @@ public class Executor {
         Game game = setupRandomGame();
         MOVE actMove;
         QLearner learner = new QLearner(13333, QConstants.numMoves, 0.1, 0.7, 0.1); //2: isEdible, 4: direction Ghost and Pills, 4: Distance intervals
-        QPacMan qPacMan = new QPacMan(learner);
+        QPacMan qPacMan = new QPacManOriginal(learner);
         qPacMan.setNewGame(game);
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -685,7 +686,38 @@ public class Executor {
         Game game = setupRandomGame();
         MOVE actMove;
         QLearner learner = new QLearner(33, QConstants.numMoves);
-        QPacManAlex qPacMan = new QPacManAlex(learner);
+        QPacMan qPacMan = new QPacManPills(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupRandomGame();
+	        	qPacMan.setNewGame(game);
+	        }
+	        if (i % 5000 == 4999)
+	        	System.out.println("Partida " + (i+1));
+        }
+        return learner;   
+    }
+    public QLearner runGameQtrainFSM(GhostController ghostController, int partidas) {
+        Game game = setupRandomGame();
+        MOVE actMove;
+        QLearner learner = new QLearner(33, QConstants.numMoves);
+        QPacMan qPacMan = new QPacManOriginal(learner);
         qPacMan.setNewGame(game);
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -714,12 +746,11 @@ public class Executor {
     }
     
     
-    
     public QLearner runGameLoadQtrain(String model, GhostController ghostController, int partidas) {
         Game game = setupGame();
         MOVE actMove;
         QLearner learner = QLearner.fromJson(model);
-        QPacMan qPacMan = new QPacMan(learner);
+        QPacMan qPacMan = new QPacManOriginal(learner);
         qPacMan.setNewGame(game);
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -749,7 +780,7 @@ public class Executor {
         Game game = setupRandomGame();
         MOVE actMove;
         QLearner learner = QLearner.fromJson(model);
-        QPacMan qPacMan = new QPacMan(learner);
+        QPacMan qPacMan = new QPacManOriginal(learner);
         qPacMan.setNewGame(game);
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -779,7 +810,7 @@ public class Executor {
         Game game = setupRandomGame();
         MOVE actMove;
         QLearner learner = QLearner.fromJson(model);
-        QPacManAlex qPacMan = new QPacManAlex(learner);
+        QPacMan qPacMan = new QPacManPills(learner);
         qPacMan.setNewGame(game);
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -822,7 +853,7 @@ public class Executor {
         Game game = setupRandomGame();
         
         MOVE actMove;
-        QPacManAlex qPacMan = new QPacManAlex(model);
+        QPacMan qPacMan = new QPacManOriginal(model);
         qPacMan.setNewGame(game);
         
         GameView gv = (visuals) ? setupQGameView(game) : null;       
@@ -857,7 +888,7 @@ public class Executor {
         Game game = setupRandomGame();
         
         MOVE actMove;
-        QPacMan qPacMan = new QPacMan(model);
+        QPacManOriginal qPacMan = new QPacManOriginal(model);
         qPacMan.setNewGame(game);
         
         GameView gv = (visuals) ? setupQGameView(game) : null;       
@@ -884,6 +915,41 @@ public class Executor {
             if (visuals)
                 gv.repaint();
         }
+        
+        return game.getScore();
+    }
+    public int runGameFSM( GhostController ghostController, int delay) {
+    	
+        Game game = setupGame();
+        MsPacMan pacManController = new MsPacMan(game);
+        
+        precompute(pacManController, ghostController);
+        
+        GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        while (!game.gameOver()) {
+            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                break;
+            }
+            handlePeek(game);
+            game.advanceGame(
+                    pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
+
+            if (visuals) {
+                gv.repaint();
+            }
+        }
+        System.out.println(game.getScore());
+        
+        postcompute(pacManController, ghostController);
         
         return game.getScore();
     }

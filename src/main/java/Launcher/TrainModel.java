@@ -17,7 +17,7 @@ public class TrainModel {
 				.build();
 		
 		GhostController ghosts = new GhostRandom();
-		QLearner model = executor.runGameQtrainAlex(ghosts, Integer.parseInt(args[1]));
+		QLearner model = executor.runGameQtrainFSM(ghosts, Integer.parseInt(args[1]));
 		
 		try(PrintStream ps = new PrintStream(args[0])){
             ps.println(model.toJson());
