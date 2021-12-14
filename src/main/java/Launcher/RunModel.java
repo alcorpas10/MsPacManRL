@@ -11,7 +11,7 @@ import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
 public class RunModel {
-public static void main(String[] args) {
+	public static void main(String[] args) {
         
 		Executor executor = new Executor.Builder()
 				.setTickLimit(4000)
@@ -27,7 +27,7 @@ public static void main(String[] args) {
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder.append(sCurrentLine).append("\n");
             }
-        } 
+        }
         catch (IOException e) {
             e.printStackTrace();
         }

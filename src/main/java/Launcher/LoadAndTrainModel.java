@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import Others.Executor;
-import Others.GhostsAggresive;
+import Others.GhostRandom;
 import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
 public class LoadAndTrainModel {
 	public static void main(String[] args) {
 		Executor executor = new Executor.Builder()
-				.setTickLimit(4000)
+				.setTickLimit(500)
 				.setVisual(true)
 				.setScaleFactor(3.0)
 				.build();
@@ -30,8 +30,8 @@ public class LoadAndTrainModel {
             e.printStackTrace();
         }
 		
-		GhostController ghosts = new GhostsAggresive();
-		QLearner model = executor.runGameLoadQtrainRandom(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
+		GhostController ghosts = new GhostRandom();
+		QLearner model = executor.runGameLoadQtrainAlex(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
 		
 		try(PrintStream ps = new PrintStream(args[0])){
             ps.println(model.toJson());

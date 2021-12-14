@@ -29,6 +29,7 @@ import pacman.game.comms.Messenger;
 import pacman.game.internal.POType;
 import pacman.game.util.Stats;
 import PacMans.QPacMan;
+import PacMans.QPacManAlex;
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
 
@@ -674,8 +675,40 @@ public class Executor {
 	        	game = setupRandomGame();
 	        	qPacMan.setNewGame(game);
 	        }
-	        if (i % 5000 == 0)
-	        	System.out.println("Partida " + i);
+	        if (i % 5000 == 4999)
+	        	System.out.println("Partida " + (i+1));
+        }
+        return learner;   
+    }
+    
+    public QLearner runGameQtrainAlex(GhostController ghostController, int partidas) {
+        Game game = setupRandomGame();
+        MOVE actMove;
+        QLearner learner = new QLearner(33, QConstants.numMoves);
+        QPacManAlex qPacMan = new QPacManAlex(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupRandomGame();
+	        	qPacMan.setNewGame(game);
+	        }
+	        if (i % 5000 == 4999)
+	        	System.out.println("Partida " + (i+1));
         }
         return learner;   
     }
@@ -742,9 +775,39 @@ public class Executor {
         return learner;   
     }
     
+    public QLearner runGameLoadQtrainAlex(String model, GhostController ghostController, int partidas) {
+        Game game = setupRandomGame();
+        MOVE actMove;
+        QLearner learner = QLearner.fromJson(model);
+        QPacManAlex qPacMan = new QPacManAlex(learner);
+        qPacMan.setNewGame(game);
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        for(int i=0; i < partidas; ++i) {
+	        while (!game.gameOver()) {
+	            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+	                break;
+	            }
+	            handlePeek(game);
+	            actMove = qPacMan.act();
+	            game.advanceGame(
+	            		actMove,
+	                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+	            
+	            qPacMan.updateStrategy();      
+	        }
+	        if(i != partidas -1) {
+	        	game = setupRandomGame();
+	        	qPacMan.setNewGame(game);
+	        }	
+        }
+        return learner;   
+    }
     
     
-    private GameView setupQGameView(Game game) {
+    
+    private GameView setupQGameView(Game game) { // TODO posible quitarlo si se usa setupGameView con null
         GameView gv;
         gv = new GameView(game, setDaemon);
         gv.setScaleFactor(scaleFactor);
@@ -756,10 +819,10 @@ public class Executor {
    
     
     public int runGameQ(QLearner model, GhostController ghostController, int delay) {
-        Game game = setupGame();
+        Game game = setupRandomGame();
         
         MOVE actMove;
-        QPacMan qPacMan = new QPacMan(model);
+        QPacManAlex qPacMan = new QPacManAlex(model);
         qPacMan.setNewGame(game);
         
         GameView gv = (visuals) ? setupQGameView(game) : null;       

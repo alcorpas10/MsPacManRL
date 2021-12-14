@@ -175,7 +175,8 @@ public final class Game {
         this.messenger = messenger;
 
         if (random)
-        	initRandomly(initialMaze);
+        	//initRandomly(initialMaze);
+        	initAlex(initialMaze);
         else
         	init(initialMaze);
         this.poType = poType;
@@ -296,31 +297,19 @@ public final class Game {
         }
 
         currentMaze = mazes[mazeIndex];
-        //RANDOM INIT PILLS
         setPills();
-        
-        //RANDOM INIT GHOSTS
         initGhosts();
-        
- 
-        /*
-        //RANDOM INIT  MSPACMAN
-        int initialNode = 0;
-        do {
-        	initialNode = (int)(Math.random()*(double)currentMaze.graph.length); 
-        }while(initialNode == currentMaze.lairNodeIndex);
-        MOVE[] poss = this.getPossibleMoves(initialNode);
-        MOVE init = poss[0];
-        internalPacman = new PacMan(initialNode, init, NUM_LIVES, false);
-        */
+
+        //RANDOM INIT
+        computeRandomInitialPosition();
+        internalPacman = new PacMan(initialNode, initialMove, NUM_LIVES, false);
+
         //FIXED INIT
-        internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
-        
-        
+        //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
     }
     
     private void initRandomly(int initialMaze) {
-    	mazeIndex = initialMaze;
+        mazeIndex = initialMaze;
         score = currentLevelTime = levelCount = totalTime = 0;
         ghostEatMultiplier = 1;
         gameOver = false;
@@ -338,37 +327,60 @@ public final class Game {
         currentMaze = mazes[mazeIndex];
         //RANDOM INIT PILLS
         setRandomPills();
-        //setPills();
         
         //RANDOM INIT GHOSTS
         initGhostsRandomly();
-        //initGhosts();
+
+        //RANDOM INIT
+        computeRandomInitialPosition();
+        internalPacman = new PacMan(initialNode, initialMove, NUM_LIVES, false);
+
+        //FIXED INIT
+        //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
+    }
+    
+    private void initAlex(int initialMaze) {
+        mazeIndex = initialMaze;
+        score = currentLevelTime = levelCount = totalTime = 0;
+        ghostEatMultiplier = 1;
+        gameOver = false;
+        timeOfLastGlobalReversal = -1;
+        pacmanWasEaten = false;
+        pillWasEaten = false;
+        powerPillWasEaten = false;
+
+        ghostsEaten = new EnumMap<>(GHOST.class);
+
+        for (GHOST ghost : GHOST.values()) {
+            ghostsEaten.put(ghost, false);
+        }
+
+        currentMaze = mazes[mazeIndex];
+        //RANDOM INIT PILLS
+        setRandomPills();
         
-      
-        
-        //RANDOM INIT  MSPACMAN
-        int initialNode = 0;
+        //RANDOM INIT GHOSTS
+        initLairGhosts();
+
+        //RANDOM INIT
+        computeRandomInitialPosition();
+        internalPacman = new PacMan(initialNode, initialMove, NUM_LIVES, false);
+
+        //FIXED INIT
+        //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
+    }
+    
+    private void computeRandomInitialPosition()
+    {
+    	
         do {
         	initialNode = (int)(Math.random()*(double)currentMaze.graph.length); 
-        	/*do {
-			  
-        		initialNode = (int)(Math.random()*(double)currentMaze.graph.length); 
-		        int pillIndex = this.getPillIndex(initialNode);
-		        if(pillIndex != -1) {
-		        	if(!this.isPillStillAvailable(pillIndex))
-	        			break;
-	        }
-	        else
-	        	break;
-
-    		}while(true);*/
         }while(initialNode == currentMaze.lairNodeIndex);
-        
         MOVE[] poss = this.getPossibleMoves(initialNode);
-        MOVE init = MOVE.NEUTRAL;
-        internalPacman = new PacMan(initialNode, init, 1, false);
-        
+        initialMove = poss[0].opposite();
+        //currentMaze.initialPacManNodeIndex = initialNode;		
     }
+    
     private void setRandomPills() {
         Random rnd = new Random();
         if (pillsPresent) {
@@ -393,10 +405,16 @@ public final class Game {
         }
     }
     
+    private void initLairGhosts() {
+    	ghosts = new EnumMap<>(GHOST.class);
+
+        for (GHOST ghostType : GHOST.values()) {
+            ghosts.put(ghostType, new Ghost(ghostType, currentMaze.lairNodeIndex, 0, Integer.MAX_VALUE, MOVE.NEUTRAL));
+        }
+    }
+    
     private void initGhostsRandomly() {
     	Random rnd = new Random();
-        
-    	
     	
     	int currentNodeIndex ;
     	int edibleTime;
@@ -422,6 +440,10 @@ public final class Game {
             ghosts.put(ghostType, new Ghost(ghostType,currentNodeIndex, edibleTime, lairTime, lastMoveMade));
         }
     }
+    
+    int initialNode = 0;
+    MOVE initialMove = MOVE.NEUTRAL;
+
     /**
      * _new level reset.
      */
@@ -445,9 +467,11 @@ public final class Game {
 
         initGhosts();
 
-        internalPacman.currentNodeIndex = currentMaze.initialPacManNodeIndex;
-        internalPacman.lastMoveMade = MOVE.LEFT;
-        internalPacman.lastDir = MOVE.LEFT;
+        computeRandomInitialPosition();
+        
+        internalPacman.currentNodeIndex = initialNode;
+        internalPacman.lastMoveMade = initialMove;
+        internalPacman.lastDir = initialMove;
     }
 
     /**
@@ -997,8 +1021,7 @@ public final class Game {
                 return ghost.lastMoveMade;
             } else {
                 MOVE[] moves = node.allPossibleMoves.get(ghost.lastMoveMade);
-                
-                return moves[rnd.nextInt(moves.length)];        	
+                return moves[rnd.nextInt(moves.length)];
             }
         }
     }
@@ -1298,7 +1321,8 @@ public final class Game {
      */
     @SuppressWarnings({"WeakerAccess", "unused"})
     public int getPacManInitialNodeIndex() {
-        return currentMaze.initialPacManNodeIndex;
+        //return currentMaze.initialPacManNodeIndex;
+    	return initialNode;
     }
 
     /**
@@ -1676,7 +1700,12 @@ public final class Game {
      */
     @SuppressWarnings({"WeakerAccess", "unused"})
     public MOVE[] getPossibleMoves(int nodeIndex, MOVE lastModeMade) {
-        return currentMaze.graph[nodeIndex].allPossibleMoves.get(lastModeMade).clone();
+        MOVE [] moves = currentMaze.graph[nodeIndex].allPossibleMoves.get(lastModeMade);
+        if(moves== null)
+        	moves = new MOVE[0];
+        else
+        	moves = moves.clone();
+        return moves;
     }
 
     /**
@@ -1700,7 +1729,13 @@ public final class Game {
      */
     @SuppressWarnings({"WeakerAccess", "unused"})
     public final int[] getNeighbouringNodes(int nodeIndex, MOVE lastModeMade) {
-        return Arrays.clone(currentMaze.graph[nodeIndex].allNeighbouringNodes.get(lastModeMade));
+        try {
+			return Arrays.clone(currentMaze.graph[nodeIndex].allNeighbouringNodes.get(lastModeMade));
+		} catch (Exception e) {
+			System.err.println(String.format("Error getNeighbouringNodes(nodeIndex: %s, lastMoveMade: %s)",nodeIndex, lastModeMade));// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return new int[0];
     }
 
     /**
@@ -2044,7 +2079,7 @@ public final class Game {
         MOVE move = null;
 
         double minDistance = Integer.MAX_VALUE;
-       
+        
         for (Entry<MOVE, Integer> entry : currentMaze.graph[fromNodeIndex].allNeighbourhoods.get(lastMoveMade).entrySet()) {
             double distance = getDistance(entry.getValue(), toNodeIndex, lastMoveMade, distanceMeasure);
 

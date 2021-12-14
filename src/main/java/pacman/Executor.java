@@ -52,7 +52,7 @@ public class Executor {
     private final Function<Game, String> peek;
     private final Logger logger = LoggerFactory.getLogger(Executor.class);
 	private boolean pacmanPOvisual;
-    private static String VERSION = "3.2.0 (ICI 21-22 random init)";
+    private static String VERSION = "3.2.2 (ICI 21-22 random init)";
 
     public static class Builder {
         private boolean pacmanPO = false;
@@ -265,7 +265,7 @@ public class Executor {
                 postcompute(pacManController, ghostController);
                 System.out.println("Game finished: " + i + "   " + description);
             } catch (Exception e) {
-            	System.err.println("ERROR: "+pacManController.getClass().getCanonicalName() + " vs "+ghostControllerCopy.getClass().getCanonicalName());
+            	System.err.println("ERROR runExperiment: "+pacManController.getClass().getCanonicalName() + " vs "+ghostControllerCopy.getClass().getCanonicalName());
                 e.printStackTrace();
             }
         }

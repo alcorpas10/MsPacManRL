@@ -14,7 +14,7 @@ public class RunRandomModel {
 public static void main(String[] args) {
         
 		Executor executor = new Executor.Builder()
-				.setTickLimit(500)
+				.setTickLimit(4000)
 				.setVisual(true)
 				.setScaleFactor(3.0)
 				.build();
