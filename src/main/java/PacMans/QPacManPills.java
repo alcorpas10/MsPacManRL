@@ -7,12 +7,11 @@ import java.util.Set;
 
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
-import es.ucm.fdi.ici.Action;
 import pacman.game.Game;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 
-public class QPacManPills extends QPacMan{
+public class QPacManPills extends QPacMan {
     private Game game;
     private QLearner agent;
     private MOVE lastJunctionMove;
@@ -21,11 +20,12 @@ public class QPacManPills extends QPacMan{
     private int lastPillDistance;
 
     // 10: eat pill, 1: get closer to pill, -1: move away from pill
-    private final int[] REWARD = {10, 1, -1};
+    private final int[] REWARD = {10, 1, -5};
     
     private final double[] MULTIPLIER = {5, 3, 2, 1.5, 1};
 
-    // State codification: pillsNumber, directionPill, distancePill : Max number -> 437 TODO directionPill 4?
+    // State codification: pillsNumber, directionPill, distancePill : Max number -> 437
+    // State codification: directionPill, distancePill : Max number -> 33
     
     public QPacManPills(QLearner learner) {
     	this.agent = learner;

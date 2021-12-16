@@ -8,7 +8,6 @@ public abstract class QPacMan implements Action {
 
 	@Override
 	public String getActionId() {
-		// TODO Auto-generated method stub
 		return "QPacMan";
 	}
 

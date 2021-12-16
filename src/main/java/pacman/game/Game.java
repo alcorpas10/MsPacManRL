@@ -169,21 +169,33 @@ public final class Game {
         this.sightLimit = sightLimit;
     }
     
-    public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean random) {
+    public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean random) { //Alex
         this.seed = seed;
         rnd = new Random(seed);
         this.messenger = messenger;
 
         if (random)
-        	//initRandomly(initialMaze);
         	initAlex(initialMaze);
         else
         	init(initialMaze);
         this.poType = poType;
         this.sightLimit = sightLimit;
     }
+    
+    public Game(long seed, int initialMaze, POType poType, int sightLimit, boolean random) { //David
+        this.seed = seed;
+        rnd = new Random(seed);
+        this.messenger = null;
+
+        if (random)
+        	initRandomly2(initialMaze);
+        else
+        	init(initialMaze);
+        this.poType = poType;
+        this.sightLimit = sightLimit;
+    }
 	
-	public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean random, boolean onlyNotEdible) {
+	public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean random, boolean onlyNotEdible) { //Dani
         this.seed = seed;
         rnd = new Random(seed);
         this.messenger = messenger;
@@ -352,6 +364,38 @@ public final class Game {
         //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
     }
 	
+    private void initRandomly2(int initialMaze) {
+    	mazeIndex = initialMaze;
+        score = currentLevelTime = levelCount = totalTime = 0;
+        ghostEatMultiplier = 1;
+        gameOver = false;
+        timeOfLastGlobalReversal = -1;
+        pacmanWasEaten = false;
+        pillWasEaten = false;
+        powerPillWasEaten = false;
+
+        ghostsEaten = new EnumMap<>(GHOST.class);
+
+        for (GHOST ghost : GHOST.values()) {
+            ghostsEaten.put(ghost, false);
+        }
+
+        currentMaze = mazes[mazeIndex];
+        //RANDOM INIT PILLS
+        setRandomPills();
+        //setPills();
+        
+        //RANDOM INIT GHOSTS
+        initGhostsRandomly2();
+        
+        //RANDOM INIT
+        computeRandomInitialPosition();
+        internalPacman = new PacMan(initialNode, initialMove, NUM_LIVES, false);
+
+        //FIXED INIT
+        //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);        
+    }
+    
 	private void initOnlyNotEdible(int initialMaze) {
         mazeIndex = initialMaze;
         score = currentLevelTime = levelCount = totalTime = 0;

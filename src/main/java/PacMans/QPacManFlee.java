@@ -7,7 +7,6 @@ import java.util.Set;
 
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
-import es.ucm.fdi.ici.Action;
 import pacman.game.Game;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
@@ -21,7 +20,7 @@ public class QPacManFlee extends QPacMan{
     private int nextState;
 
     //private final int[] REWARD = {1000, -100, -1000000, 100000};
-    private final int[] REWARD = {-10000, 10};
+    private final int[] REWARD = {-1000, 1};
 
     public QPacManFlee(QLearner learner) {
 		this.agent = learner;
@@ -77,7 +76,8 @@ public class QPacManFlee extends QPacMan{
 		
 		
     	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
-
+    	
+    	this.lastJunctionState = this.nextState;
     }
 
     public MOVE act() {
@@ -228,13 +228,6 @@ public class QPacManFlee extends QPacMan{
     	int ghostNode = -1;
     	try {
     		int reward;
-        	boolean eatenGhost = false;
-        	for (GHOST g: GHOST.values()) {
-        		if (game.wasGhostEaten(g)) {
-        			eatenGhost = true;
-        			break;
-        		}
-        	}
         	
         	if (game.wasPacManEaten())
         		reward = REWARD[0];
@@ -347,14 +340,42 @@ public class QPacManFlee extends QPacMan{
 
 	@Override
 	public String getActionId() {
-		// TODO Auto-generated method stub
-		return null;
+		return "Flee Action";
 	}
 
 	@Override
 	public MOVE execute(Game game) {
-		// TODO Auto-generated method stub
-		return null;
+		if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+		     
+	        MOVE[] possibleActions = game.getPossibleMoves(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
+	        
+	        Set<Integer> possibleActionsSet = new HashSet<>();
+	        
+	        for(MOVE a: possibleActions)
+	        	possibleActionsSet.add(a.ordinal());
+	
+	        if(!possibleActionsSet.isEmpty()) {
+	        	int action = agent.selectAction(lastJunctionState, possibleActionsSet).getIndex();
+	            switch(action) {
+	    		case 0:
+	    			this.lastJunctionMove = MOVE.UP;
+	    			break;
+	    		case 1:
+	    			this.lastJunctionMove = MOVE.RIGHT;
+	    			break;
+	    		case 2:
+	    			this.lastJunctionMove = MOVE.DOWN;
+	    			break;
+	    		case 3:
+	    			this.lastJunctionMove = MOVE.LEFT;
+	    			break;
+	    		default:
+	    			this.lastJunctionMove = MOVE.NEUTRAL;
+	            }     
+	        }
+	        return this.lastJunctionMove;
+    	}
+    	return MOVE.NEUTRAL;
 	}
 }
 

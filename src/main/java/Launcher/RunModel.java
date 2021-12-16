@@ -21,8 +21,8 @@ public class RunModel {
 		
 		GhostController ghosts = new GhostRandom();
 		
-		StringBuilder contentBuilder = new StringBuilder();
-       /* try (BufferedReader br = new BufferedReader(new FileReader(args[0]))) {
+		/*StringBuilder contentBuilder = new StringBuilder();
+		try (BufferedReader br = new BufferedReader(new FileReader(args[0]))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder.append(sCurrentLine).append("\n");
@@ -33,6 +33,6 @@ public class RunModel {
         }*/
 		
         //QLearner learner = QLearner.fromJson(contentBuilder.toString());
-		System.out.println(executor.runGameFSM( ghosts, 40));
+		System.out.println(executor.runGameFSM(ghosts, 40));
 	}
 }
