@@ -122,7 +122,7 @@ public class QPacManFlee extends QPacMan{
     	this.nextState = edibleInt*10000 + directionGhost.ordinal()*1000 + directionPill.ordinal()*100 + distanceGhost*10 + distancePill;
     }*/
     private void calculateState(int distanceGhost, int distancePill, boolean edible, MOVE directionGhost, MOVE directionPill) {
-    	this.nextState = directionGhost.ordinal()*1000 +  + distanceGhost*10;
+    	this.nextState = directionGhost.ordinal()*10 +  + distanceGhost;
     }
     /**
      * Basic strategy 
