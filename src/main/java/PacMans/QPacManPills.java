@@ -24,7 +24,6 @@ public class QPacManPills extends QPacMan {
     
     private final double[] MULTIPLIER = {5, 3, 2, 1.5, 1};
 
-    // State codification: pillsNumber, directionPill, distancePill : Max number -> 437
     // State codification: directionPill, distancePill : Max number -> 33
     
     public QPacManPills(QLearner learner) {
@@ -220,7 +219,6 @@ public class QPacManPills extends QPacMan {
 
 	@Override
 	public String getActionId() {
-		// TODO Auto-generated method stub
 		return "Pills Action";
 	}
 

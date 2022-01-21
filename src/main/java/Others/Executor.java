@@ -986,7 +986,7 @@ public class Executor {
         return game.getScore();
     }
     
-    public int runGameFSM( GhostController ghostController, int delay) {
+    public int runGameFSM(GhostController ghostController, int delay) {
         Game game = setupGame();
         MsPacMan pacManController = new MsPacMan(game);
         
@@ -1019,6 +1019,45 @@ public class Executor {
         postcompute(pacManController, ghostController);
         
         return game.getScore();
+    }
+    
+    public Stats[] runFSMExperiment(GhostController ghostController, int trials, String description) {
+        Stats stats = new Stats(description);
+        Stats ticks = new Stats(description + " Ticks");
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+        Game game;
+
+        Long startTime = System.currentTimeMillis();
+        for (int i = 0; i < trials; ) {
+            try {
+                game = setupGame();
+                MsPacMan pacManController = new MsPacMan(game);
+
+                precompute(pacManController, ghostController);
+                while (!game.gameOver()) {
+                    if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                        break;
+                    }
+                    handlePeek(game);
+                    game.advanceGame(
+                            pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+                            ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+                }
+                stats.add(game.getScore());
+                ticks.add(game.getCurrentLevelTime());
+                i++;
+                postcompute(pacManController, ghostController);
+                System.out.println("Game finished: " + i + "   " + description);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long timeTaken = System.currentTimeMillis() - startTime;
+        stats.setMsTaken(timeTaken);
+        ticks.setMsTaken(timeTaken);
+
+        
+        return new Stats[]{stats, ticks};
     }
 
 	private Game setupRandomGame() {

@@ -1,4 +1,6 @@
 package es.ucm.fdi.ici;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Vector;
 
@@ -16,7 +18,7 @@ public class Scores {
 
 	public Scores(Vector<String> list_pacMan,Vector<String> list_ghosts)
 	{
-		this.list_pacMan = list_pacMan; 
+		this.list_pacMan = list_pacMan;
 		this.list_ghosts = list_ghosts;
 		stats = new Stats[list_pacMan.size()][list_ghosts.size()];
 		for(int pc = 0; pc<list_pacMan.size(); pc++)
@@ -51,12 +53,9 @@ public class Scores {
 	public void printScoreAndRanking()
 	{
 		System.out.println("Scores Table");
-        for(Stats[] result_pacman : stats)
-        {
+        for(Stats[] result_pacman : stats) {
         	for(Stats s: result_pacman)
-        	{
         		System.out.print(s.getAverage()+";");
-        	}
         	System.out.println();
         }      
         System.out.println("MsPacMan Ranking");
@@ -67,6 +66,29 @@ public class Scores {
         for(ScorePair sp: ghostsRanking)
         	System.out.println(sp);
 
+	}
+	
+	public void exportToFile(String file) {
+		FileWriter myWriter;
+	    try {
+	    	myWriter = new FileWriter(file);
+	    	myWriter.write("Scores Table");
+	    	for(Stats[] result_pacman : stats)
+	    		for(Stats s: result_pacman)
+	    			myWriter.write(s.getAverage()+";");
+	    	
+	    	myWriter.write("MsPacMan Ranking");
+	    	for(ScorePair sp: pacManRanking)
+	    		myWriter.write(sp.toString());
+	    	
+	    	myWriter.write("Ghosts Ranking");
+	    	for(ScorePair sp: ghostsRanking)
+	    		myWriter.write(sp.toString());
+	    	
+	    	myWriter.close();
+	    } catch (IOException e) {
+	    	e.printStackTrace();
+	    }
 	}
 	
 	synchronized void computeRanking()

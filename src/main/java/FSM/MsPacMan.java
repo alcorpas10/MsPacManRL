@@ -31,7 +31,7 @@ public class MsPacMan extends PacmanController {
 	QPacMan qPacManChase;
 	
 	public MsPacMan(Game game) {
-		setName("MsPacMan 05");
+		setName("MsPacManQLearn");
 		fsm = new FSM("MsPacMan");
 		
 		GraphFSMObserver observer = new GraphFSMObserver(fsm.toString());
@@ -43,7 +43,7 @@ public class MsPacMan extends PacmanController {
     	qPacManChase = new QPacManChase(new QLearner(33, 4));*/
     	
     	StringBuilder contentBuilder1 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelFlee-R-1000-10.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("modelFlee.json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder1.append(sCurrentLine).append("\n");
@@ -111,7 +111,6 @@ public class MsPacMan extends PacmanController {
     	JPanel main = new JPanel();
     	main.setLayout(new BorderLayout());
     	main.add(observer.getAsPanel(true, null), BorderLayout.CENTER);
-    	//main.add(c1observer.getAsPanel(true, null), BorderLayout.SOUTH);
     	frame.getContentPane().add(main);
     	frame.pack();
     	frame.setVisible(true);
