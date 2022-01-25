@@ -905,14 +905,14 @@ public class Executor {
     
     
     
-    private GameView setupQGameView(Game game) { // TODO posible quitarlo si se usa setupGameView con null
+    /*private GameView setupQGameView(Game game) { // TODO posible quitarlo si se usa setupGameView con null
         GameView gv;
         gv = new GameView(game, setDaemon);
         gv.setScaleFactor(scaleFactor);
         gv.showGame();
         if(pacmanPOvisual) gv.setPO(this.pacmanPO);
         return gv;
-    }
+    }*/
     
    
     
@@ -923,7 +923,7 @@ public class Executor {
         QPacMan qPacMan = new QPacManOriginal(model);
         qPacMan.setNewGame(game);
         
-        GameView gv = (visuals) ? setupQGameView(game) : null;       
+        GameView gv = (visuals) ? setupGameView(null, game) : null;       
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 
@@ -958,7 +958,7 @@ public class Executor {
         QPacManOriginal qPacMan = new QPacManOriginal(model);
         qPacMan.setNewGame(game);
         
-        GameView gv = (visuals) ? setupQGameView(game) : null;       
+        GameView gv = (visuals) ? setupGameView(null, game) : null;       
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 

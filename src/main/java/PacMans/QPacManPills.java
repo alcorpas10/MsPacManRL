@@ -93,7 +93,7 @@ public class QPacManPills extends QPacMan {
     }
     
     private void calculateState(int pillsNumber, MOVE directionPill, int distancePill) {    	
-    	this.nextState = /*pillsNumber*100*/ + directionPill.ordinal()*10 + distancePill;
+    	this.nextState = directionPill.ordinal()*10 + distancePill;
     }
     
     private int discretizePillsNumber(int number) {
@@ -110,27 +110,11 @@ public class QPacManPills extends QPacMan {
     }
     
     private int discretizePillDistance(int distance) {
-    	/*if(distance <= 10 && distance >= 0)
+		if(distance <= 15)
 			return 0;
-		else if(distance <= 20)
+		else if(distance <= 35)
 			return 1;
-		else if(distance <= 30)
-			return 2;
-		else if(distance <= 45)
-			return 3;
 		else if(distance <= 60)
-			return 4;
-		else if(distance <= 80)
-			return 5;
-		else if(distance <= 100)
-			return 6;
-		else
-			return 7;*/
-		if(distance <= 20)
-			return 0;
-		else if(distance <= 50)
-			return 1;
-		else if(distance <= 80)
 			return 2;
 		else
 			return 3;
