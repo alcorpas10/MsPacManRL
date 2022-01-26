@@ -30,12 +30,11 @@ public class MsPacMan extends PacmanController {
 	QPacMan qPacManPills;
 	QPacMan qPacManChase;
 	
-	public MsPacMan(Game game) {
-		setName("MsPacManQLearn");
+	public MsPacMan(Game game, int numTrainings) {
 		fsm = new FSM("MsPacMan");
 		
-		GraphFSMObserver observer = new GraphFSMObserver(fsm.toString());
-    	fsm.addObserver(observer);
+		/*GraphFSMObserver observer = new GraphFSMObserver(fsm.toString());
+    	fsm.addObserver(observer);*/
     	
     	/*qPacManGeneral = new QPacManOriginal(new QLearner(13333, 4));
     	qPacManFlee = new QPacManFlee(new QLearner(13333, 4));
@@ -43,7 +42,7 @@ public class MsPacMan extends PacmanController {
     	qPacManChase = new QPacManChase(new QLearner(33, 4));*/
     	
     	StringBuilder contentBuilder1 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelFlee.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("modelFlee"+numTrainings+".json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder1.append(sCurrentLine).append("\n");
@@ -53,7 +52,7 @@ public class MsPacMan extends PacmanController {
             e.printStackTrace();
         }
         StringBuilder contentBuilder2 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelPills.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("modelPills"+numTrainings+".json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder2.append(sCurrentLine).append("\n");
@@ -63,7 +62,7 @@ public class MsPacMan extends PacmanController {
             e.printStackTrace();
         }
         StringBuilder contentBuilder3 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelChase.json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("modelChase"+numTrainings+".json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder3.append(sCurrentLine).append("\n");
@@ -107,13 +106,13 @@ public class MsPacMan extends PacmanController {
     	fsm.ready(generalState);
     	
     	
-    	JFrame frame = new JFrame();
+    	/*JFrame frame = new JFrame();
     	JPanel main = new JPanel();
     	main.setLayout(new BorderLayout());
     	main.add(observer.getAsPanel(true, null), BorderLayout.CENTER);
     	frame.getContentPane().add(main);
     	frame.pack();
-    	frame.setVisible(true);
+    	frame.setVisible(true);*/
     	
 	}
 	

@@ -33,6 +33,7 @@ public class PacManEvaluatorTFG {
 	public static final String OUTPUT_FILE_NAME = "file";
 	
 	
+	
 	//ONLY FOR CBR
 	public static final int LIMIT = 2000;
 
@@ -41,6 +42,8 @@ public class PacManEvaluatorTFG {
 	private Vector<PacmanController> list_pacMan; 
 	private Vector<GhostController> list_ghosts;
 	private Scores scores;
+	private int trials;
+	
 
 	void setDefaultProperites()
 	{
@@ -119,14 +122,17 @@ public class PacManEvaluatorTFG {
 	
 	 void run()
 	{
-		int trials =  Integer.parseInt(properties.getProperty(KEY_TRIALS));
+		trials =  Integer.parseInt(properties.getProperty(KEY_TRIALS));
 		Vector<String> names_pacMan = new Vector<String>();
 		Vector<String> names_ghosts = new Vector<String>();
 		for(Controller<?> c: list_pacMan)
 			names_pacMan.add(c.getName());
 		for(Controller<?> c: list_ghosts)
 			names_ghosts.add(c.getName());
-		names_pacMan.add("MsPacManQLearn");
+		
+		for(int numTrainings=1;numTrainings<=1000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos	
+			names_pacMan.add("MsPacManQLearn"+numTrainings);
+		}
 		scores = new Scores(names_pacMan,names_ghosts);
 	    int p = 0;
 	    for(PacmanController pacMan: list_pacMan)
@@ -146,16 +152,20 @@ public class PacManEvaluatorTFG {
 	    }
 	    
     	int g=0;
-	    for(GhostController ghosts: list_ghosts) {
-            try {  
-	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManQLearn - " + ghosts.getClass().getName());
-	    		scores.put("MsPacManQLearn", ghosts.getName(), result[0]);
-	    		g++; //TODO
-        	}catch(Exception e) {
-        		System.err.println("Error executing pacman "+p+"  ghost: "+g);
-        		System.err.println(e);	
-        	}
-        }
+    	
+    	for(int numTrainings=1;numTrainings<=1000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos
+    		for(GhostController ghosts: list_ghosts) {
+                try {  
+    	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManQLearn"+numTrainings+" - " + ghosts.getClass().getName(), numTrainings);
+    	    		scores.put("MsPacManQLearn"+numTrainings, ghosts.getName(), result[0]);
+    	    		g++; //TODO
+            	}catch(Exception e) {
+            		System.err.println("Error executing pacman "+p+"  ghost: "+g);
+            		System.err.println(e);	
+            	}
+            }
+    	}
+	    
 
 	}
 	
@@ -170,7 +180,7 @@ public class PacManEvaluatorTFG {
 			scores.computeRanking();
 			
 			String file = properties.getProperty(OUTPUT_FILE_NAME);
-			scores.exportToFile(file);
+			scores.exportToFile(file,trials);
 		} catch (Exception e) {
 			System.err.println(e.getLocalizedMessage());
 			e.printStackTrace();

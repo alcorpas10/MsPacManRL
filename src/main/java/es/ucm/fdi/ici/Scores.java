@@ -55,7 +55,7 @@ public class Scores {
 		System.out.println("Scores Table");
         for(Stats[] result_pacman : stats) {
         	for(Stats s: result_pacman)
-        		System.out.print(s.getAverage()+";");
+        		System.out.print(s.getDescription()+": "+s.getAverage()+";");
         	System.out.println();
         }      
         System.out.println("MsPacMan Ranking");
@@ -68,22 +68,22 @@ public class Scores {
 
 	}
 	
-	public void exportToFile(String file) {
+	public void exportToFile(String file,int trials) {
 		FileWriter myWriter;
 	    try {
 	    	myWriter = new FileWriter(file);
-	    	myWriter.write("Scores Table");
+	    	myWriter.write("Trials: "+trials+"\n");
+	    	//quien ha luchado con quien
+	    	myWriter.write("Scores Table\n");
 	    	for(Stats[] result_pacman : stats)
 	    		for(Stats s: result_pacman)
-	    			myWriter.write(s.getAverage()+";");
+	    			myWriter.write(s.getDescription()+": "+s.getAverage()+";\n");
 	    	
-	    	myWriter.write("MsPacMan Ranking");
+	    	myWriter.write("MsPacMan Ranking\n");
 	    	for(ScorePair sp: pacManRanking)
-	    		myWriter.write(sp.toString());
+	    		myWriter.write(sp.toString()+"\n");
 	    	
-	    	myWriter.write("Ghosts Ranking");
-	    	for(ScorePair sp: ghostsRanking)
-	    		myWriter.write(sp.toString());
+	    
 	    	
 	    	myWriter.close();
 	    } catch (IOException e) {

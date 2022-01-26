@@ -988,7 +988,7 @@ public class Executor {
     
     public int runGameFSM(GhostController ghostController, int delay) {
         Game game = setupGame();
-        MsPacMan pacManController = new MsPacMan(game);
+        MsPacMan pacManController = new MsPacMan(game,0);
         
         precompute(pacManController, ghostController);
         
@@ -1021,7 +1021,7 @@ public class Executor {
         return game.getScore();
     }
     
-    public Stats[] runFSMExperiment(GhostController ghostController, int trials, String description) {
+    public Stats[] runFSMExperiment(GhostController ghostController, int trials, String description,int numTrainings) {
         Stats stats = new Stats(description);
         Stats ticks = new Stats(description + " Ticks");
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -1031,8 +1031,7 @@ public class Executor {
         for (int i = 0; i < trials; ) {
             try {
                 game = setupGame();
-                MsPacMan pacManController = new MsPacMan(game);
-
+                MsPacMan pacManController = new MsPacMan(game,numTrainings);
                 precompute(pacManController, ghostController);
                 while (!game.gameOver()) {
                     if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
