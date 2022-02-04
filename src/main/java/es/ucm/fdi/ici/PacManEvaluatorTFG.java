@@ -130,7 +130,7 @@ public class PacManEvaluatorTFG {
 		for(Controller<?> c: list_ghosts)
 			names_ghosts.add(c.getName());
 		
-		for(int numTrainings=1;numTrainings<=1000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos	
+		for(int numTrainings=1000;numTrainings<=10000000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos	
 			names_pacMan.add("MsPacManQLearn"+numTrainings);
 		}
 		scores = new Scores(names_pacMan,names_ghosts);
@@ -153,10 +153,12 @@ public class PacManEvaluatorTFG {
 	    
     	int g=0;
     	
-    	for(int numTrainings=1;numTrainings<=1000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos
+    	String ghostType;
+    	for(int numTrainings=1000;numTrainings<=10000000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos
     		for(GhostController ghosts: list_ghosts) {
                 try {  
-    	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManQLearn"+numTrainings+" - " + ghosts.getClass().getName(), numTrainings);
+                	ghostType = ghosts.getClass().getName();
+    	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManQLearn"+numTrainings+" - " + ghostType, numTrainings, ghostType.replace("Others.Ghost", ""));
     	    		scores.put("MsPacManQLearn"+numTrainings, ghosts.getName(), result[0]);
     	    		g++; //TODO
             	}catch(Exception e) {

@@ -30,7 +30,7 @@ public class MsPacMan extends PacmanController {
 	QPacMan qPacManPills;
 	QPacMan qPacManChase;
 	
-	public MsPacMan(Game game, int numTrainings) {
+	public MsPacMan(Game game, int numTrainings, String ghostType) {
 		fsm = new FSM("MsPacMan");
 		
 		/*GraphFSMObserver observer = new GraphFSMObserver(fsm.toString());
@@ -42,7 +42,7 @@ public class MsPacMan extends PacmanController {
     	qPacManChase = new QPacManChase(new QLearner(33, 4));*/
     	
     	StringBuilder contentBuilder1 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelFlee"+numTrainings+".json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("FleeModel" + ghostType + numTrainings+".json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder1.append(sCurrentLine).append("\n");
@@ -52,7 +52,7 @@ public class MsPacMan extends PacmanController {
             e.printStackTrace();
         }
         StringBuilder contentBuilder2 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelPills"+numTrainings+".json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("PillsModel" + ghostType + numTrainings+".json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder2.append(sCurrentLine).append("\n");
@@ -62,7 +62,7 @@ public class MsPacMan extends PacmanController {
             e.printStackTrace();
         }
         StringBuilder contentBuilder3 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("modelChase"+numTrainings+".json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("ChaseModel" + ghostType + numTrainings+".json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder3.append(sCurrentLine).append("\n");
