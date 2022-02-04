@@ -33,7 +33,7 @@ public class QPacManChase extends QPacMan {
 		
 		GHOST ghost = getNearestGhost(msPacManNode, msPacManMove);
 		boolean edible = false;
-		int distanceGhost = 4;
+		int distanceGhost = 3;
 		MOVE directionGhost = MOVE.UP;
 		
 		
@@ -102,6 +102,9 @@ public class QPacManChase extends QPacMan {
     
     private void calculateState(int distanceGhost, MOVE directionGhost) {
     	this.nextState =  directionGhost.ordinal()*10 + distanceGhost;
+    	if(nextState == -1) {
+			System.out.println("Fallo");
+		}
     }
     
     public void updateStrategy() {
@@ -110,7 +113,7 @@ public class QPacManChase extends QPacMan {
     	
     	
     	GHOST ghost = null;
-    	int distanceGhost = -1;
+    	int distanceGhost = 3;
     	int ghostNode = -1;
     	
 		int reward;

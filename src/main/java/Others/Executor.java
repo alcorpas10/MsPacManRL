@@ -684,8 +684,8 @@ public class Executor {
         return learner;   
     }
     
-    public QLearner runGameQtrainAlex(GhostController ghostController, int partidas) {
-        Game game = setupAlexGame();
+    public QLearner runGameQtrainPills(GhostController ghostController, int partidas) {
+        Game game = setupPillsGame();
         MOVE actMove;
         QLearner learner = new QLearner(33, QConstants.numMoves);
         QPacMan qPacMan = new QPacManPills(learner);
@@ -716,8 +716,8 @@ public class Executor {
         return learner;   
     }
     
-    public QLearner runGameQtrainDani(GhostController ghostController, int partidas) {
-        Game game = setupDaniGame();
+    public QLearner runGameQtrainFlee(GhostController ghostController, int partidas) {
+        Game game = setupFleeGame();
         MOVE actMove;
         QLearner learner = new QLearner(33, QConstants.numMoves);
         QPacMan qPacMan = new QPacManFlee(learner);
@@ -739,7 +739,7 @@ public class Executor {
 	            qPacMan.updateStrategy();      
 	        }
 	        if(i != partidas -1) {
-	        	game = setupDaniGame();
+	        	game = setupFleeGame();
 	        	qPacMan.setNewGame(game);
 	        }
 	        if (i % 5000 == 4999)
@@ -748,10 +748,10 @@ public class Executor {
         return learner;   
     }
     
-    public QLearner runGameQtrainDavid(GhostController ghostController, int partidas) {
-        Game game = setupDavidGame();
+    public QLearner runGameQtrainChase(GhostController ghostController, int partidas) {
+        Game game = setupChaseGame();
         MOVE actMove;
-        QLearner learner = new QLearner(33, QConstants.numMoves, 0.1, 0.5, 0.1); //3: direction Ghost , 3: Distance ghost
+        QLearner learner = new QLearner(33, QConstants.numMoves); //3: direction Ghost , 3: Distance ghost
         QPacMan qPacMan = new QPacManChase(learner);
         qPacMan.setNewGame(game);
 
@@ -771,7 +771,7 @@ public class Executor {
 	            qPacMan.updateStrategy();      
 	        }
 	        if(i != partidas -1) {
-	        	game = setupDavidGame();
+	        	game = setupChaseGame();
 	        	qPacMan.setNewGame(game);
 	        }
 	        if (i % 5000 == 4999)
@@ -780,7 +780,7 @@ public class Executor {
         return learner;   
     }
     
-    public QLearner runGameQtrainFSM(GhostController ghostController, int partidas) {
+    public QLearner runGameQtrainOriginal(GhostController ghostController, int partidas) {
         Game game = setupRandomGame();
         MOVE actMove;
         QLearner learner = new QLearner(33, QConstants.numMoves);
@@ -1063,15 +1063,15 @@ public class Executor {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, false);
 	}
 	
-	private Game setupAlexGame() {
+	private Game setupPillsGame() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true);
 	}
 	
-	private Game setupDavidGame() {
+	private Game setupChaseGame() {
 		return new Game(rnd.nextLong(), 0, poType, sightLimit, true);
 	}
 	
-	private Game setupDaniGame() {
+	private Game setupFleeGame() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true,true);
 	}
 }

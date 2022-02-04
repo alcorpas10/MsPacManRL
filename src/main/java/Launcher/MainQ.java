@@ -1,7 +1,7 @@
 package Launcher;
 
 import Others.Executor;
-import Others.GhostAggresive;
+import Others.GhostAggressive;
 import chen0040.rl.learning.qlearn.QLearner;
 import pacman.controllers.GhostController;
 
@@ -15,7 +15,7 @@ public class MainQ {
 				.setScaleFactor(3.0)
 				.build();
 		
-		GhostController ghosts = new GhostAggresive();
+		GhostController ghosts = new GhostAggressive();
 		QLearner model = executor.runGameQtrainRandom(ghosts, 100);
 		
 		System.out.println(executor.runGameQ(model, ghosts, 40));
