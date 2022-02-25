@@ -1,1 +1,0 @@
-Scores Table4930.0;11290.0;5402.0;1822.0;1172.0;1532.0;MsPacMan Rankinges.ucm.fdi.ici.c2021.practica2.grupo04.MsPacMan: 7207,33MsPacManQLearn: 1508,67Ghosts RankingOthers.GhostRandom: 3376,00Others.GhostAlgorithmic: 3467,00Others.GhostAggresive: 6231,00
