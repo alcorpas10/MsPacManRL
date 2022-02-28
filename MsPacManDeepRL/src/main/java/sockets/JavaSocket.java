@@ -23,14 +23,14 @@ public class JavaSocket {
                     try {
                         BufferedReader stdIn =new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                        while(true){
+                        //while(true){
                             System.out.println("Trying to read...");
                             String in = stdIn.readLine();
                             System.out.println(in);
                             out.print("Try"+"\r\n");
                             out.flush();
                             System.out.println("Message sent");
-                        }
+                        //}
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

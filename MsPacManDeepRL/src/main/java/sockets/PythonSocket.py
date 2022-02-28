@@ -12,8 +12,8 @@ except socket.error as err:
 s.listen(10)
 print("Socket Listening")
 conn, addr = s.accept()
-while(True):
-    conn.send(bytes("Message"+"\r\n",'UTF-8'))
-    print("Message sent")
-    data = conn.recv(1024)
-    print(data.decode(encoding='UTF-8'))
+#while(True):
+conn.send(bytes("Message"+"\r\n",'UTF-8'))
+print("Message sent")
+data = conn.recv(1024)
+print(data.decode(encoding='UTF-8'))
