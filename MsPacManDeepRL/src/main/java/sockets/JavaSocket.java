@@ -13,7 +13,7 @@ public class JavaSocket {
 
     public static void main(String args[]){
             try {
-            	socket = new Socket("localhost",9999);
+            	socket = new Socket("localhost",38514);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -23,14 +23,14 @@ public class JavaSocket {
                     try {
                         BufferedReader stdIn =new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                        //while(true){
+                        while(true){
                             System.out.println("Trying to read...");
                             String in = stdIn.readLine();
                             System.out.println(in);
                             out.print("Try"+"\r\n");
                             out.flush();
                             System.out.println("Message sent");
-                        //}
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
