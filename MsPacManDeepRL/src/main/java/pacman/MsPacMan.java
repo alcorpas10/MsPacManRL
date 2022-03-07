@@ -18,23 +18,15 @@ public class MsPacMan extends PacmanController {
 	private BufferedReader fromServer;
 	private PrintWriter toServer;
 	private Game game;
-	private boolean wasJunction;
 	private int lastScore;
 	
 	public MsPacMan(Socket socket) {
-
+		this.lastScore = 0;
 		try {
 
 			fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			toServer = new PrintWriter(socket.getOutputStream(), true);
-			/*
-			 * while(true){ System.out.println("Trying to read...");
-			 *  String in =fromServer.readLine();
-			 *   System.out.println(in);
-			 *   toServer.print("Try"+"\r\n");
-			 * toServer.flush(); 
-			 * System.out.println("Message sent"); }
-			 */
+			
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -48,24 +40,31 @@ public class MsPacMan extends PacmanController {
 		int msPacManNode=game.getPacmanCurrentNodeIndex();
 		if(game.isJunction(msPacManNode)) {
 			this.game = game;
-			int m=4;
-			List<Integer> distPills=getDistanceToNearestPills(msPacManNode);
-			
-			wasJunction=true;
-			lastScore=game.getScore();
-			try {
-				toServer.print(distPills);
-				toServer.flush();
-				m =Integer.parseInt(fromServer.readLine());
-				
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return MOVE.values()[m];  
+			sendState(msPacManNode);
+			return recieveAction();
 		}
 		return MOVE.NEUTRAL;  
 	}
-
+	
+	private void sendState(int msPacManNode) {
+		List<Integer> distPills=getDistanceToNearestPills(msPacManNode);
+		int currentScore = game.getScore();
+		int reward = currentScore - lastScore;
+		lastScore = currentScore;
+		toServer.print(distPills + ";" + reward);
+		toServer.flush();
+	}
+	
+	private MOVE recieveAction() {
+		try {
+			int m = Integer.parseInt(fromServer.readLine());
+			return MOVE.values()[m];
+		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+			return MOVE.NEUTRAL;
+		}
+	}
+	
 	private List<Integer> getDistanceToNearestPills(int msPacManNode) {
 
 		List<Integer> l = Arrays.asList(new Integer[] { 250, 250, 250, 250 });
@@ -91,15 +90,19 @@ public class MsPacMan extends PacmanController {
 		return minDistance;
 	}
 	
-	public void nextStep(boolean done) {
-		if(wasJunction) {
-			int msPacManNode=game.getPacmanCurrentNodeIndex();
-			List<Integer> distPills=getDistanceToNearestPills(msPacManNode);
-			int reward=game.getScore()-lastScore;
-			
-			toServer.print(distPills+";"+reward+";"+done);
-			toServer.flush();
-			wasJunction=false;
+	
+	public int getEpisodes() {
+		try {
+			return Integer.parseInt(fromServer.readLine());
+		} catch (NumberFormatException|IOException e) {
+			e.printStackTrace();
+			return 0;
 		}
+	}
+
+	public void gameOver() {
+		toServer.print("gameOver;" +(game.getScore() - lastScore));
+		toServer.flush();
+		this.lastScore = 0;
 	}
 }

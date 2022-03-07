@@ -1,15 +1,10 @@
 package sockets;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 
-import engine.pacman.Executor;
 import engine.pacman.controllers.GhostController;
-import engine.pacman.controllers.PacmanController;
 import ghosts.GhostRandom;
 import pacman.ExecutorDeepLearn;
 import pacman.MsPacMan;
@@ -17,7 +12,6 @@ import pacman.MsPacMan;
 public class Main {
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		ExecutorDeepLearn executor = new ExecutorDeepLearn.Builder()
 	            .setTickLimit(4000)
 	            .setVisual(true)
@@ -30,14 +24,9 @@ public class Main {
 			MsPacMan pacMan = new MsPacMan(socket);
 	        GhostController ghosts = new GhostRandom();
 	        
-	        System.out.println(executor.runGame(pacMan, ghosts, 20));
+	        System.out.println(executor.runEpisodes(pacMan, ghosts, "Deep Learn"));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-		
-        
-        
-
 	}
-
 }

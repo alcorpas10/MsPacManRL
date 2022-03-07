@@ -324,7 +324,7 @@ public class ExecutorDeepLearn {
      * @param ghostController  The Ghosts controller
      * @param delay            The delay between time-steps
      */
-    public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {
+    public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {//NO funciona
         Game game = setupGame();
 
         precompute(pacManController, ghostController);
@@ -342,7 +342,7 @@ public class ExecutorDeepLearn {
                     pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
                     ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
             
-            pacManController.nextStep(game.gameOver());
+            //pacManController.nextStep();
             try {
                 Thread.sleep(delay);
             } catch (Exception e) {
@@ -357,6 +357,48 @@ public class ExecutorDeepLearn {
         postcompute(pacManController, ghostController);
         
         return game.getScore();
+    }
+    
+    public Stats[] runEpisodes(MsPacMan pacManController, GhostController ghostController, String description) {
+        Stats stats = new Stats(description);
+        Stats ticks = new Stats(description + " Ticks");
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+        Game game;
+        int episodes = pacManController.getEpisodes();
+        System.out.println("Episodes: " + episodes);
+
+
+        Long startTime = System.currentTimeMillis();
+        for (int i = 0; i < episodes; ) {
+            try {
+                game = setupGame();
+                precompute(pacManController, ghostControllerCopy);
+                while (!game.gameOver()) {
+                    if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                        break;
+                    }
+                    handlePeek(game);
+                    game.advanceGame(
+                            pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+                            ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+                }
+                pacManController.gameOver();
+                stats.add(game.getScore());
+                ticks.add(game.getCurrentLevelTime());
+                i++;
+                postcompute(pacManController, ghostController);
+                System.out.println("Game finished: " + i + "   " + description);
+            } catch (Exception e) {
+            	System.err.println("ERROR runExperiment: "+pacManController.getClass().getCanonicalName() + " vs "+ghostControllerCopy.getClass().getCanonicalName());
+                e.printStackTrace();
+            }
+        }
+        long timeTaken = System.currentTimeMillis() - startTime;
+        stats.setMsTaken(timeTaken);
+        ticks.setMsTaken(timeTaken);
+
+        
+        return new Stats[]{stats, ticks};
     }
 
     private void postcompute(Controller<MOVE> pacManController, GhostController ghostController) {
