@@ -280,6 +280,10 @@ public class ExecutorDeepLearn {
     private Game setupGame() {
         return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit) : new Game(rnd.nextLong(), 0, null, poType, sightLimit);
     }
+    
+    private Game setupPillsGame() {
+    	return new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true);
+    }
 
     private void handlePeek(Game game){
         if(peek != null) logger.info(peek.apply(game));
@@ -371,7 +375,7 @@ public class ExecutorDeepLearn {
         Long startTime = System.currentTimeMillis();
         for (int i = 0; i < episodes; ) {
             try {
-                game = setupGame();
+                game = setupPillsGame();
                 precompute(pacManController, ghostControllerCopy);
                 while (!game.gameOver()) {
                     if (tickLimit != -1 && tickLimit < game.getTotalTime()) {

@@ -175,7 +175,7 @@ public final class Game {
         this.messenger = messenger;
 
         if (random)
-        	initAlex(initialMaze);
+        	initPills(initialMaze);
         else
         	init(initialMaze);
         this.poType = poType;
@@ -475,7 +475,7 @@ public final class Game {
         internalPacman = new PacMan(initialNode, init, 1, false);
     }
 	
-    private void initAlex(int initialMaze) {
+    private void initPills(int initialMaze) {
         mazeIndex = initialMaze;
         score = currentLevelTime = levelCount = totalTime = 0;
         ghostEatMultiplier = 1;
@@ -493,7 +493,8 @@ public final class Game {
 
         currentMaze = mazes[mazeIndex];
         //RANDOM INIT PILLS
-        setRandomPills();
+        //setRandomPills();
+        setPills();
         
         //RANDOM INIT GHOSTS
         initLairGhosts();

@@ -475,7 +475,7 @@ public final class Game {
         internalPacman = new PacMan(initialNode, init, 1, false);
     }
 	
-    private void initAlex(int initialMaze) {
+    private void initAlex(int initialMaze) { //TODO quitar Alex, David, Dani...
         mazeIndex = initialMaze;
         score = currentLevelTime = levelCount = totalTime = 0;
         ghostEatMultiplier = 1;
