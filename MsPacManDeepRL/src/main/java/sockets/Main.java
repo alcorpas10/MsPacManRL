@@ -13,7 +13,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		ExecutorDeepLearn executor = new ExecutorDeepLearn.Builder()
-	            .setTickLimit(400)
+	            .setTickLimit(4000)
 	            .setVisual(true)
 	            .setScaleFactor(3.0)
 	            .build();
