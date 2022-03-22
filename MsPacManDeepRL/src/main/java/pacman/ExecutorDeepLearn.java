@@ -375,7 +375,7 @@ public class ExecutorDeepLearn {
         Long startTime = System.currentTimeMillis();
         for (int i = 0; i < episodes; ) {
             try {
-                game = setupPillsGame();
+                game = setupGame();
                 precompute(pacManController, ghostControllerCopy);
                 while (!game.gameOver()) {
                     if (tickLimit != -1 && tickLimit < game.getTotalTime()) {

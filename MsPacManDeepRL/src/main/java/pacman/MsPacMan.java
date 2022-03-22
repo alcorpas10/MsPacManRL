@@ -66,7 +66,7 @@ public class MsPacMan extends PacmanController {
 			if (g == null) {
 				distGhosts.add(maxDistance);
 				dirGhosts.add(MOVE.NEUTRAL.ordinal());
-				edibleTimeGhosts.add(lairTime);
+				edibleTimeGhosts.add(-1);//TODO ver que valor poner y preguntar en reunion
 			} else {
 
 				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), msPacManLastMove,
@@ -169,8 +169,6 @@ public class MsPacMan extends PacmanController {
 		GHOST nearestGhost = null;
 		for (GHOST ghost : GHOST.values()) {
 			pos = game.getGhostCurrentNodeIndex(ghost);
-			// Meter un -1 en la distancia estropearia todo el proceso ya que es mayor que
-			// cualquier distancia
 			if (pos != game.getCurrentMaze().lairNodeIndex)
 				distance = (int) game.getDistance(msPacManNode, pos, move, DM.PATH);
 			else
