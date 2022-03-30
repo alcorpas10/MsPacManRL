@@ -7,11 +7,9 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import engine.pacman.controllers.PacmanController;
-import engine.pacman.game.Constants;
 import engine.pacman.game.Constants.DM;
 import engine.pacman.game.Constants.GHOST;
 import engine.pacman.game.Constants.MOVE;
@@ -22,21 +20,25 @@ public class MsPacMan extends PacmanController {
 	private BufferedReader fromServer;
 	private PrintWriter toServer;
 	private Game game;
+	private static int maxDistance = 500;
+	private MOVE lastMoveMade;
 	private int lastScore;
-	private static int maxDistance = 250;
+	private int lastLives;
+	private int lastLevel;
+	private int lastTime;
 
 	public MsPacMan(Socket socket) {
+		this.lastMoveMade = MOVE.UP;
 		this.lastScore = 0;
+		this.lastLives = 3;
+		this.lastLevel = 3;
+		this.lastTime = 0;
 		try {
-
 			fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			toServer = new PrintWriter(socket.getOutputStream(), true);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		;
-
 	}
 
 	@Override
@@ -45,7 +47,7 @@ public class MsPacMan extends PacmanController {
 		if (game.isJunction(msPacManNode)) {
 			this.game = game;
 			sendState(msPacManNode);
-			return recieveAction();
+			return recieveAction(msPacManNode);
 		}
 		return MOVE.NEUTRAL;
 	}
@@ -53,49 +55,57 @@ public class MsPacMan extends PacmanController {
 	private void sendState(int msPacManNode) {
 		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 		List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
-		int numPills = game.getNumberOfActivePills();
-		int numPowerPills = game.getNumberOfActivePowerPills();
-		int currentTime = game.getCurrentLevelTime();
 		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
-		MOVE msPacManLastMove = game.getPacmanLastMoveMade();
 		List<Integer> distGhosts = new ArrayList<>();
-		List<Integer> dirGhosts = new ArrayList<>();
-		List<Integer> edibleTimeGhosts = new ArrayList<>();
-		int lairTime = Constants.COMMON_LAIR_TIME + 10;
 		for (GHOST g : lGhost) {
-			if (g == null) {
+			if (g == null)
 				distGhosts.add(maxDistance);
-				dirGhosts.add(MOVE.NEUTRAL.ordinal());
-				edibleTimeGhosts.add(-1);//TODO ver que valor poner y preguntar en reunion
-			} else {
-
-				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), msPacManLastMove,
-						DM.PATH));
-				dirGhosts.add(game.getGhostLastMoveMade(g).ordinal());
-				edibleTimeGhosts.add(game.getGhostEdibleTime(g));
-			}
+			else
+				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
 		}
 
-		int aux;
-		for (GHOST gh : GHOST.values()) {
-			aux = game.getGhostLairTime(gh);
-			if (aux < lairTime && aux != 0) {
-				lairTime = aux;
-			}
-		}
-
-		int currentScore = game.getScore();
-		int reward = currentScore - lastScore;
-		lastScore = currentScore;
-		toServer.print(distPills + "/" + distPowerPills + "/" + numPills + "/" + numPowerPills + "/" + currentTime + "/"
-				+ distGhosts + "/" + dirGhosts + "/" + edibleTimeGhosts + "/" + lairTime + ";" + reward);
+		
+		
+		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts + ";"
+				+ calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 	}
 
-	private MOVE recieveAction() {
+	private int calculateReward() {
+		int currentScore = game.getScore();
+		int rewardForPills = currentScore - lastScore;
+		lastScore = currentScore;
+		
+		int currentLives = game.getPacmanNumberOfLivesRemaining();
+		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
+		lastLives = currentLives;
+		
+		int currentTime = game.getTotalTime();
+		int rewardForTime = lastTime - currentTime;
+		lastTime = currentTime;
+		
+		int currentLevel = game.getCurrentLevel();
+		int rewardForLevel = (currentLevel > lastLevel) ? 100 : 0;
+		lastLevel = currentLevel;
+		
+		return rewardForPills + rewardForLives + rewardForTime + rewardForLevel;
+	}
+	
+	private MOVE recieveAction(int msPacManNode) {
 		try {
-			int m = Integer.parseInt(fromServer.readLine());
-			return MOVE.values()[m];
+			String data = fromServer.readLine();
+			String moves[] = data.split(";");
+			MOVE[] movements = game.getPossibleMoves(msPacManNode);
+			List<MOVE> l = Arrays.asList(movements);
+			MOVE m1 = MOVE.values()[Integer.parseInt(moves[0])];
+			MOVE m2 = MOVE.values()[Integer.parseInt(moves[1])];
+			if (l.contains(m1)) {
+				lastMoveMade = m1;
+				return m1;
+			} else {
+				lastMoveMade = m2;
+				return m2;
+			}
 		} catch (NumberFormatException | IOException e) {
 			e.printStackTrace();
 			return MOVE.NEUTRAL;
@@ -106,7 +116,7 @@ public class MsPacMan extends PacmanController {
 
 		List<Integer> l = Arrays.asList(new Integer[] { maxDistance, maxDistance, maxDistance, maxDistance });
 
-		for (MOVE m : game.getPossibleMoves(msPacManNode, game.getPacmanLastMoveMade())) {
+		for (MOVE m : game.getPossibleMoves(msPacManNode)) {
 			l.set(m.ordinal(), getDistanceToNearestPill(m, msPacManNode));
 		}
 
@@ -131,7 +141,7 @@ public class MsPacMan extends PacmanController {
 
 		List<Integer> l = Arrays.asList(new Integer[] { maxDistance, maxDistance, maxDistance, maxDistance });
 
-		for (MOVE m : game.getPossibleMoves(msPacManNode, game.getPacmanLastMoveMade())) {
+		for (MOVE m : game.getPossibleMoves(msPacManNode)) {
 			l.set(m.ordinal(), getDistanceToNearestPowerPill(m, msPacManNode));
 		}
 
@@ -156,7 +166,7 @@ public class MsPacMan extends PacmanController {
 
 		List<GHOST> l = Arrays.asList(new GHOST[] { null, null, null, null });
 
-		for (MOVE m : game.getPossibleMoves(msPacManNode, game.getPacmanLastMoveMade())) {
+		for (MOVE m : game.getPossibleMoves(msPacManNode)) {
 			l.set(m.ordinal(), getNearestGhost(m, msPacManNode));
 		}
 
@@ -178,9 +188,6 @@ public class MsPacMan extends PacmanController {
 				nearestGhost = ghost;
 			}
 		}
-		/*
-		 * if (minDistance == Integer.MAX_VALUE) minDistance = -1;
-		 */
 		return nearestGhost;
 	}
 
@@ -194,7 +201,7 @@ public class MsPacMan extends PacmanController {
 	}
 
 	public void gameOver() {
-		toServer.print("gameOver;" + (game.getScore() - lastScore));
+		toServer.print("gameOver;" + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 		this.lastScore = 0;
 	}

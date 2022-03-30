@@ -328,7 +328,7 @@ public class ExecutorDeepLearn {
      * @param ghostController  The Ghosts controller
      * @param delay            The delay between time-steps
      */
-    public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {//NO funciona
+    public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {
         Game game = setupGame();
 
         precompute(pacManController, ghostController);
@@ -337,6 +337,9 @@ public class ExecutorDeepLearn {
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 
+        int episodes = pacManController.getEpisodes();
+        System.out.println("Episodes: " + episodes);
+        
         while (!game.gameOver()) {
             if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
                 break;
@@ -356,6 +359,8 @@ public class ExecutorDeepLearn {
                 gv.repaint();
             }
         }
+        pacManController.gameOver();
+
         System.out.println(game.getScore());
         
         postcompute(pacManController, ghostController);

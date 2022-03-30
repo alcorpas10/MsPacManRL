@@ -1008,7 +1008,7 @@ public final class Game {
         }
         _updatePacMan(pacManMove);                    //move pac-man
         eatPill();                                    //eat a pill
-        eatPowerPill();                            //eat a power pill
+        dontEatPowerPill();                            //TODO changed //eat a power pill
     }
 
     /**
@@ -1163,7 +1163,7 @@ public final class Game {
         
         try {
 			//direction is correct, return it
-			if (node.neighbourhood.containsKey(direction)&&(direction != internalPacman.lastDir.opposite())){
+			if (node.neighbourhood.containsKey(direction)/*&&(direction != internalPacman.lastDir.opposite())*/){ //TODO changed
 				internalPacman.lastDir = direction;	
 				return direction;
 			} else {
@@ -1294,6 +1294,18 @@ public final class Game {
 
             powerPillWasEaten = true;
         }
+    }
+    
+    private void dontEatPowerPill() {
+    	powerPillWasEaten = false;
+    	
+    	int powerPillIndex = currentMaze.graph[internalPacman.currentNodeIndex].powerPillIndex;
+    	
+    	if (powerPillIndex >= 0 && powerPills.get(powerPillIndex)) {
+    		score += POWER_PILL;
+    		ghostEatMultiplier = 1;
+    		powerPills.clear(powerPillIndex);
+    	}
     }
 
     private boolean reverseGhosts(Map<GHOST, MOVE> moves, boolean force) {
