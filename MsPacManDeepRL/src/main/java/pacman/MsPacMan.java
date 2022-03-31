@@ -63,9 +63,6 @@ public class MsPacMan extends PacmanController {
 			else
 				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
 		}
-
-		
-		
 		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts + ";"
 				+ calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
@@ -103,6 +100,7 @@ public class MsPacMan extends PacmanController {
 				lastMoveMade = m1;
 				return m1;
 			} else {
+				
 				lastMoveMade = m2;
 				return m2;
 			}
@@ -204,5 +202,13 @@ public class MsPacMan extends PacmanController {
 		toServer.print("gameOver;" + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 		this.lastScore = 0;
+	}
+	public void getOk() {
+		try {
+			String data = fromServer.readLine();  //Waits OK
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

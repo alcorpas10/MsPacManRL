@@ -337,8 +337,7 @@ public class ExecutorDeepLearn {
 
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 
-        int episodes = pacManController.getEpisodes();
-        System.out.println("Episodes: " + episodes);
+     
         
         while (!game.gameOver()) {
             if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
@@ -392,6 +391,7 @@ public class ExecutorDeepLearn {
                             ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
                 }
                 pacManController.gameOver();
+                pacManController.getOk();
                 stats.add(game.getScore());
                 ticks.add(game.getCurrentLevelTime());
                 i++;

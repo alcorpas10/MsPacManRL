@@ -5,11 +5,12 @@ import java.io.IOException;
 import java.net.Socket;
 
 import engine.pacman.controllers.GhostController;
+import ghosts.GhostAggressive;
 import ghosts.GhostRandom;
 import pacman.ExecutorDeepLearn;
 import pacman.MsPacMan;
 
-public class Main2 {
+public class MainTrain {
 	
 	public static void main(String[] args) {
 		ExecutorDeepLearn executor = new ExecutorDeepLearn.Builder()
@@ -19,12 +20,14 @@ public class Main2 {
 	            .build();
 		
 		try {
+			
 			Socket socket = new Socket("localhost",38514);
 			
 			MsPacMan pacMan = new MsPacMan(socket);
-	        GhostController ghosts = new GhostRandom();
+	        GhostController ghosts = new GhostAggressive();
 	        
-	        System.out.println(executor.runGame(pacMan, ghosts, 40));
+	        System.out.println(executor.runEpisodes(pacMan, ghosts, "Deep Learn"));
+			
         } catch (IOException e1) {
             e1.printStackTrace();
         }
