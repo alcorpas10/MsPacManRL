@@ -21,7 +21,7 @@ public class MainTrain {
 		
 		try {
 			
-			Socket socket = new Socket("localhost",38514);
+			Socket socket = new Socket("localhost", Integer.parseInt(args[0]));
 			
 			MsPacMan pacMan = new MsPacMan(socket);
 	        GhostController ghosts = new GhostAggressive();
