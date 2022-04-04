@@ -128,14 +128,14 @@ def q_execute(model,epsilon=0.1):
     
     while True:
         # Implement greedy search policy to explore the state space 
-        if random.random() < epsilon:
+        """if random.random() < epsilon:
             action1 = random.randint(0,3)
             action2 = (action1+1) % 4
             game.send_action(action1, action2)
-        else:
-            q_values = model.predict(state)
-            prediction = torch.topk(q_values, k=2)
-            game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
+        else:"""
+        q_values = model.predict(state)
+        prediction = torch.topk(q_values, k=2)
+        game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
         
 
         # Take action and add reward to total
@@ -143,7 +143,7 @@ def q_execute(model,epsilon=0.1):
 
 def main():
     #f = open("model1000.mdl",'r')
-    model= torch.load('model10000.mdl')
+    model= torch.load('model1000000n256.mdl')
     q_execute(model)    
 
 if __name__ == "__main__":
