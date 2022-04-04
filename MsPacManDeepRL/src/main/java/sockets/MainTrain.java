@@ -26,7 +26,7 @@ public class MainTrain {
 			MsPacMan pacMan = new MsPacMan(socket);
 	        GhostController ghosts = new GhostAggressive();
 	        
-	        System.out.println(executor.runEpisodes(pacMan, ghosts, "Deep Learn"));
+	        System.out.println(executor.runEpisodesTrainEdible(pacMan, ghosts, "Deep Learn"));
 			
         } catch (IOException e1) {
             e1.printStackTrace();

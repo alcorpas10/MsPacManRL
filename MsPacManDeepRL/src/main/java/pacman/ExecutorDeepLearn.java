@@ -278,11 +278,19 @@ public class ExecutorDeepLearn {
     }
 
     private Game setupGame() {
-        return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit) : new Game(rnd.nextLong(), 0, null, poType, sightLimit);
+        return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, false, false) : new Game(rnd.nextLong(), 0, null, poType, sightLimit, false, false);
+    }
+    
+    private Game setupGameTrainNotEdible() {
+    	return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true, false) : new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, false);
+    }
+    
+    private Game setupGameTrainEdible() {
+        return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true, true) : new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, true);
     }
     
     private Game setupPillsGame() {
-    	return new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true);
+    	return new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true, true);
     }
 
     private void handlePeek(Game game){
@@ -329,7 +337,7 @@ public class ExecutorDeepLearn {
      * @param delay            The delay between time-steps
      */
     public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {
-        Game game = setupGame();
+        Game game = setupGameTrainEdible();
 
         precompute(pacManController, ghostController);
         
@@ -367,7 +375,7 @@ public class ExecutorDeepLearn {
         return game.getScore();
     }
     
-    public Stats[] runEpisodes(MsPacMan pacManController, GhostController ghostController, String description) {
+    public Stats[] runEpisodesTrainNotEdible(MsPacMan pacManController, GhostController ghostController, String description) {
         Stats stats = new Stats(description);
         Stats ticks = new Stats(description + " Ticks");
         GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -380,6 +388,49 @@ public class ExecutorDeepLearn {
         for (int i = 0; i < episodes; ) {
             try {
                 game = setupGame();
+                precompute(pacManController, ghostControllerCopy);
+                while (!game.gameOver()) {
+                    if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                        break;
+                    }
+                    handlePeek(game);
+                    game.advanceGame(
+                            pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+                            ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+                }
+                pacManController.gameOver();
+                pacManController.getOk();
+                stats.add(game.getScore());
+                ticks.add(game.getCurrentLevelTime());
+                i++;
+                postcompute(pacManController, ghostController);
+                System.out.println("Game finished: " + i + "   " + description);
+            } catch (Exception e) {
+            	System.err.println("ERROR runExperiment: "+pacManController.getClass().getCanonicalName() + " vs "+ghostControllerCopy.getClass().getCanonicalName());
+                e.printStackTrace();
+            }
+        }
+        long timeTaken = System.currentTimeMillis() - startTime;
+        stats.setMsTaken(timeTaken);
+        ticks.setMsTaken(timeTaken);
+
+        
+        return new Stats[]{stats, ticks};
+    }
+    
+    public Stats[] runEpisodesTrainEdible(MsPacMan pacManController, GhostController ghostController, String description) {
+        Stats stats = new Stats(description);
+        Stats ticks = new Stats(description + " Ticks");
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+        Game game;
+        int episodes = pacManController.getEpisodes();
+        System.out.println("Episodes: " + episodes);
+
+
+        Long startTime = System.currentTimeMillis();
+        for (int i = 0; i < episodes; ) {
+            try {
+                game = setupGameTrainEdible();
                 precompute(pacManController, ghostControllerCopy);
                 while (!game.gameOver()) {
                     if (tickLimit != -1 && tickLimit < game.getTotalTime()) {

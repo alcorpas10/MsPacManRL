@@ -23,7 +23,7 @@ public class MainExecute {
 			Socket socket = new Socket("localhost",38514);
 			
 			MsPacMan pacMan = new MsPacMan(socket);
-	        GhostController ghosts = new GhostAggressive();
+	        GhostController ghosts = new GhostRandom();
 	        
 	        System.out.println(executor.runGame(pacMan, ghosts, 40));
         } catch (IOException e1) {

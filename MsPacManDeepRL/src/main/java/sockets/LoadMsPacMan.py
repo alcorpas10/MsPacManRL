@@ -143,7 +143,7 @@ def q_execute(model,epsilon=0.1):
 
 def main():
     #f = open("model1000.mdl",'r')
-    model= torch.load('model1000000n256.mdl')
+    model= torch.load('model1500Prueba100.mdl')
     q_execute(model)    
 
 if __name__ == "__main__":

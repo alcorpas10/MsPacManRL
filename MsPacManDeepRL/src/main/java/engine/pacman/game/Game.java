@@ -128,6 +128,9 @@ public final class Game {
     private String PacManControllerName ="";
     private String GhostsControllerName ="";
     
+    private int ghostDefaultEdibleTime = 0;
+    private boolean isTraining;
+    
 
     /**
      * Instantiates a new game. The seed is used to initialise the pseudo-random
@@ -169,6 +172,19 @@ public final class Game {
         this.sightLimit = sightLimit;
     }
     
+    public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean training, boolean edible) {
+    	if(edible)
+    		this.ghostDefaultEdibleTime = Integer.MAX_VALUE;
+    	this.isTraining = training;
+    	this.seed = seed;
+        rnd = new Random(seed);
+        this.messenger = messenger;
+        this.poType = poType;
+        this.sightLimit = sightLimit;
+        init(initialMaze);
+    }
+    
+    /*
     public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean random) { //Alex
         this.seed = seed;
         rnd = new Random(seed);
@@ -207,6 +223,7 @@ public final class Game {
         this.poType = poType;
         this.sightLimit = sightLimit;
     }
+    */
     
     /////////////////////////////////////////////////////////////////////////////
     ///////////////////  Constructors and initialisers  /////////////////////////
@@ -364,37 +381,7 @@ public final class Game {
         //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
     }
 	
-    private void initRandomly2(int initialMaze) {
-    	mazeIndex = initialMaze;
-        score = currentLevelTime = levelCount = totalTime = 0;
-        ghostEatMultiplier = 1;
-        gameOver = false;
-        timeOfLastGlobalReversal = -1;
-        pacmanWasEaten = false;
-        pillWasEaten = false;
-        powerPillWasEaten = false;
-
-        ghostsEaten = new EnumMap<>(GHOST.class);
-
-        for (GHOST ghost : GHOST.values()) {
-            ghostsEaten.put(ghost, false);
-        }
-
-        currentMaze = mazes[mazeIndex];
-        //RANDOM INIT PILLS
-        setRandomPills();
-        //setPills();
-        
-        //RANDOM INIT GHOSTS
-        initGhostsRandomly2();
-        
-        //RANDOM INIT
-        computeRandomInitialPosition();
-        internalPacman = new PacMan(initialNode, initialMove, NUM_LIVES, false);
-
-        //FIXED INIT
-        //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);        
-    }
+    
     
 	private void initOnlyNotEdible(int initialMaze) {
         mazeIndex = initialMaze;
@@ -616,33 +603,6 @@ public final class Game {
             ghosts.put(ghostType, new Ghost(ghostType,currentNodeIndex, edibleTime, lairTime, lastMoveMade));
         }
     }
-    
-	private void initGhostsRandomly2() {
-    	Random rnd = new Random();
-  
-    	
-    	int currentNodeIndex ;
-    	int edibleTime;
-    	int lairTime;
-    	MOVE lastMoveMade;
-    	
-    	ghosts = new EnumMap<>(GHOST.class);
-        
-        for (GHOST ghostType : GHOST.values()) {
-        	
-        	currentNodeIndex = (int)(Math.random()*(double)currentMaze.graph.length);
-           
-        	edibleTime = Integer.MAX_VALUE;
-            
-            if(currentNodeIndex==currentMaze.lairNodeIndex)
-            	lairTime = rnd.nextInt((int) (ghostType.initialLairTime * (Math.pow(LAIR_REDUCTION, levelCount % LEVEL_RESET_REDUCTION)))-1)+1;
-            else 
-            	lairTime=0;
-            lastMoveMade = MOVE.NEUTRAL;
-        	
-            ghosts.put(ghostType, new Ghost(ghostType,currentNodeIndex, edibleTime, lairTime, lastMoveMade));
-        }
-    }
 	
 	private void initGhostsRandomlyOnlyNotEdible() {
         Random rnd = new Random();
@@ -725,7 +685,7 @@ public final class Game {
         ghosts = new EnumMap<>(GHOST.class);
 
         for (GHOST ghostType : GHOST.values()) {
-            ghosts.put(ghostType, new Ghost(ghostType, currentMaze.lairNodeIndex, 0,
+            ghosts.put(ghostType, new Ghost(ghostType, currentMaze.lairNodeIndex, this.ghostDefaultEdibleTime,
                     (int) (ghostType.initialLairTime * (Math.pow(LAIR_REDUCTION, levelCount % LEVEL_RESET_REDUCTION))), MOVE.NEUTRAL));
         }
     }
@@ -959,6 +919,15 @@ public final class Game {
         updateGhosts(ghostMoves);
         updateGame();
     }
+    
+    public void advanceGameTrain(MOVE pacManMove, Map<GHOST, MOVE> ghostMoves) {
+        if (!canBeForwarded()) {
+            return;
+        }
+        updatePacMan(pacManMove);
+        updateGhosts(ghostMoves);
+        updateGame();
+    }
 
     @SuppressWarnings({"WeakerAccess", "unused"})
     public void advanceGameWithoutReverse(MOVE pacManMove, Map<GHOST, MOVE> ghostMoves) {
@@ -1008,7 +977,11 @@ public final class Game {
         }
         _updatePacMan(pacManMove);                    //move pac-man
         eatPill();                                    //eat a pill
-        dontEatPowerPill();                            //TODO changed //eat a power pill
+        if(this.isTraining) 
+        	dontEatPowerPill();
+        else
+        	eatPowerPill();
+        
     }
 
     /**
@@ -1350,7 +1323,7 @@ public final class Game {
                 {
                     score += GHOST_EAT_SCORE * ghostEatMultiplier;
                     ghostEatMultiplier *= 2;
-                    ghost.edibleTime = 0;
+                    ghost.edibleTime = this.ghostDefaultEdibleTime;
                     ghost.lairTime = (int) (COMMON_LAIR_TIME * (Math.pow(LAIR_REDUCTION, levelCount % LEVEL_RESET_REDUCTION)));
                     ghost.currentNodeIndex = currentMaze.lairNodeIndex;
                     ghost.lastMoveMade = MOVE.NEUTRAL;
@@ -1377,6 +1350,8 @@ public final class Game {
             }
         }
     }
+    
+    
 
     /**
      * _check level state.
