@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import engine.es.ucm.fdi.ici.Action;
 import engine.pacman.controllers.PacmanController;
 import engine.pacman.game.Constants.DM;
 import engine.pacman.game.Constants.GHOST;
@@ -16,7 +17,7 @@ import engine.pacman.game.Constants.MOVE;
 
 import engine.pacman.game.Game;
 
-public class MsPacMan extends PacmanController {
+public class MsPacMan extends PacmanController implements Action {
 	private BufferedReader fromServer;
 	private PrintWriter toServer;
 	private Game game;
@@ -26,8 +27,10 @@ public class MsPacMan extends PacmanController {
 	private int lastLives;
 	private int lastLevel;
 	private int lastTime;
+	private String name;
 
-	public MsPacMan(Socket socket) {
+	public MsPacMan(Socket socket, String name) {
+		this.name = name;
 		this.lastMoveMade = MOVE.UP;
 		this.lastScore = 0;
 		this.lastLives = 3;
@@ -210,5 +213,21 @@ public class MsPacMan extends PacmanController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getActionId() {
+		return this.name;
+	}
+
+	@Override
+	public MOVE execute(Game game) {
+		int msPacManNode = game.getPacmanCurrentNodeIndex();
+		if (game.isJunction(msPacManNode)) {
+			this.game = game;
+			sendState(msPacManNode);
+			return recieveAction(msPacManNode);
+		}
+		return MOVE.NEUTRAL;
 	}
 }

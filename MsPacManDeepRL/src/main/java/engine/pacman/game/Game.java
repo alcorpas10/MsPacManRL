@@ -181,7 +181,10 @@ public final class Game {
         this.messenger = messenger;
         this.poType = poType;
         this.sightLimit = sightLimit;
-        init(initialMaze);
+        if (edible)
+        	initRandomlyEdible(initialMaze);
+        else
+        	init(initialMaze);
     }
     
     /*
@@ -348,6 +351,34 @@ public final class Game {
 
         //FIXED INIT
         //internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
+    }
+    
+    private void initRandomlyEdible(int initialMaze) {
+    	mazeIndex = initialMaze;
+    	score = currentLevelTime = levelCount = totalTime = 0;
+    	ghostEatMultiplier = 1;
+    	gameOver = false;
+    	timeOfLastGlobalReversal = -1;
+    	pacmanWasEaten = false;
+    	pillWasEaten = false;
+    	powerPillWasEaten = false;
+    	
+    	ghostsEaten = new EnumMap<>(GHOST.class);
+    	
+    	for (GHOST ghost : GHOST.values()) {
+    		ghostsEaten.put(ghost, false);
+    	}
+    	
+    	currentMaze = mazes[mazeIndex];
+    	setPills();
+    	initGhostsRandomlyEdible();
+    	
+    	//RANDOM INIT
+    	computeRandomInitialPosition();
+    	internalPacman = new PacMan(initialNode, initialMove, NUM_LIVES, false);
+    	
+    	//FIXED INIT
+    	//internalPacman = new PacMan(currentMaze.initialPacManNodeIndex, MOVE.LEFT, NUM_LIVES, false);
     }
     
     private void initRandomly(int initialMaze) {
@@ -601,6 +632,23 @@ public final class Game {
             lastMoveMade = MOVE.NEUTRAL;
         	
             ghosts.put(ghostType, new Ghost(ghostType,currentNodeIndex, edibleTime, lairTime, lastMoveMade));
+        }
+    }
+    
+    private void initGhostsRandomlyEdible() {
+    	int currentNodeIndex;
+    	
+    	ghosts = new EnumMap<>(GHOST.class);
+        
+        for (GHOST ghostType : GHOST.values()) {
+        	
+        	currentNodeIndex = (int)(Math.random()*(double)currentMaze.graph.length);
+            
+        	while (currentNodeIndex == currentMaze.lairNodeIndex) {
+            	currentNodeIndex = (int)(Math.random()*(double)currentMaze.graph.length);
+            }
+        	
+            ghosts.put(ghostType, new Ghost(ghostType,currentNodeIndex, this.ghostDefaultEdibleTime, 0, MOVE.NEUTRAL));
         }
     }
 	

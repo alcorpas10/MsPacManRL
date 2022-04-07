@@ -3,6 +3,7 @@ import torch
 from torch.autograd import Variable
 import socket
 import random
+import sys
 
 class Game():
     def __init__(self, host="localhost", port=38514):
@@ -116,10 +117,9 @@ class DQN_replay(DQN):
             
             self.update(states.tolist(), all_q_values.tolist())
 
-
-def q_execute(model,epsilon=0.1):
+def q_execute(model, port=38514):
     """Deep Q Learning algorithm using the DQN. """
-    game = Game()  
+    game = Game(port=port)
     game.connect()
     q_values = []
            
@@ -128,23 +128,17 @@ def q_execute(model,epsilon=0.1):
     
     while True:
         # Implement greedy search policy to explore the state space 
-        """if random.random() < epsilon:
-            action1 = random.randint(0,3)
-            action2 = (action1+1) % 4
-            game.send_action(action1, action2)
-        else:"""
         q_values = model.predict(state)
         prediction = torch.topk(q_values, k=2)
         game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
-        
 
         # Take action and add reward to total
         state, _ , _= game.get_state() 
 
 def main():
-    #f = open("model1000.mdl",'r')
-    model= torch.load('model1500Prueba100.mdl')
-    q_execute(model)    
+    args = sys.argv[1:]
+    model = torch.load(args[0])
+    q_execute(model, port=int(args[1]))
 
 if __name__ == "__main__":
     main()

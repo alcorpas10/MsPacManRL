@@ -1,4 +1,4 @@
-package sockets;
+package launchers;
 
 
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.net.Socket;
 
 import engine.pacman.controllers.GhostController;
 import ghosts.GhostAggressive;
+import ghosts.GhostAlgorithmic;
 import ghosts.GhostRandom;
 import pacman.ExecutorDeepLearn;
 import pacman.MsPacMan;
@@ -22,8 +23,8 @@ public class MainExecute {
 		try {
 			Socket socket = new Socket("localhost",38514);
 			
-			MsPacMan pacMan = new MsPacMan(socket);
-	        GhostController ghosts = new GhostRandom();
+			MsPacMan pacMan = new MsPacMan(socket, "");
+	        GhostController ghosts = new GhostAlgorithmic();
 	        
 	        System.out.println(executor.runGame(pacMan, ghosts, 40));
         } catch (IOException e1) {

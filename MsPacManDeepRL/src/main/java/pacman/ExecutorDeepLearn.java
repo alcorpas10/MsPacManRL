@@ -17,6 +17,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import FSM.MsPacManFSM;
 import engine.pacman.controllers.Controller;
 import engine.pacman.controllers.GhostController;
 import engine.pacman.controllers.HumanController;
@@ -459,6 +460,43 @@ public class ExecutorDeepLearn {
 
         
         return new Stats[]{stats, ticks};
+    }
+    
+    public int runGameFSM(GhostController ghostController, int delay) {
+        Game game = setupGame();
+        MsPacManFSM pacManController = new MsPacManFSM();
+        
+        precompute(pacManController, ghostController);
+        
+        GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
+
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+
+        while (!game.gameOver()) {
+            if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                break;
+            }
+            handlePeek(game);
+            game.advanceGame(
+                    pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+                    ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+
+            try {
+                Thread.sleep(delay);
+            } catch (Exception e) {
+            }
+
+            if (visuals) {
+                gv.repaint();
+            }
+        }
+        pacManController.gameOver();
+        pacManController.getOk();
+        System.out.println(game.getScore());
+        
+        postcompute(pacManController, ghostController);
+        
+        return game.getScore();
     }
 
     private void postcompute(Controller<MOVE> pacManController, GhostController ghostController) {
