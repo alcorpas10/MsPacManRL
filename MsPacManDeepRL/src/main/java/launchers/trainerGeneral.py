@@ -1,14 +1,15 @@
-from os import O_EXCL
+# %%
+import random
 import torch
 from torch.autograd import Variable
 import socket
-import random
 import sys
 
+# %%
 class Game():
-    def __init__(self, host="localhost", port=38514):
+    def __init__(self, host="localhost", port=38514, num_episodes=100):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
+        self.episodes = num_episodes
         self.error_num = 1
         try:
             self.sock.bind((host, port))
@@ -18,6 +19,7 @@ class Game():
     def connect(self):
         self.sock.listen(1)
         self.conn, _ = self.sock.accept()
+        self.conn.send(bytes(str(self.episodes) + "\n",'UTF-8'))
         
     def get_state(self):
         data = self.conn.recv(512)
@@ -36,15 +38,15 @@ class Game():
             list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
             list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
             list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))
-            
+            list_edible_time_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
 
-            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts
+
+            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_time_ghosts
             
             max_num = 500
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
-        
             
         except Exception as e:
             print(e)
@@ -52,7 +54,7 @@ class Game():
             f.write(str(self.error_num) + ": " + data + "\n")
             f.close()
             self.error_num += 1
-            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
+            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
             reward = 0
             action = 0
         return next_state, reward, action
@@ -60,13 +62,15 @@ class Game():
     def send_action(self, action1, action2):
         self.conn.send(bytes(str(action1) + ";" + str(action2) + "\n",'UTF-8'))
 
-
+# %%
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=12, action_dim=4, hidden_dim=8, lr=0.0005):
+    def __init__(self, state_dim=16, action_dim=4, hidden_dim=8, lr=0.0005):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
+                        torch.nn.LeakyReLU(),
+                        torch.nn.Linear(hidden_dim,hidden_dim),
                         torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr) #cambiar
@@ -85,6 +89,7 @@ class DQN():
         with torch.no_grad():
             return self.model(torch.Tensor(state))
 
+# %%
 class DQN_replay(DQN):
     def replay(self, memory, size=32, gamma=0.9):
         """New replay function"""
@@ -113,35 +118,65 @@ class DQN_replay(DQN):
             #Update q values
             all_q_values[range(len(all_q_values)),actions]=rewards+gamma*torch.max(all_q_values_next, axis=1).values
             all_q_values[is_dones_indices.tolist(), actions_tensor[is_dones].tolist()]=rewards[is_dones_indices.tolist()]
-        
             
             self.update(states.tolist(), all_q_values.tolist())
 
-def q_execute(model, port=38514):
+# %%
+def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, replay_size=32, memory_size=10000, title='DQN Replay'):
     """Deep Q Learning algorithm using the DQN. """
-    game = Game(port=port)
+    game = Game(num_episodes=episodes, port=port)
     game.connect()
     q_values = []
-           
-    # Reset state
-    state, _, _ = game.get_state()
+    memory = []
+    episode_i = 0
     
-    while True:
-        # Implement greedy search policy to explore the state space 
-        q_values = model.predict(state)
-        prediction = torch.topk(q_values, k=2)
-        game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
+    for episode in range(episodes):
+        episode_i += 1
+        
+        # Reset state
+        state, _, _ = game.get_state()
+        
+        while True:
+            # Implement greedy search policy to explore the state space
+            if random.random() < epsilon:
+                action1 = random.randint(0,3)
+                action2 = (action1+1) % 4
+                game.send_action(action1, action2)
+            else:
+                q_values = model.predict(state)
+                prediction = torch.topk(q_values, k=2)
+                game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
 
-        # Take action and add reward to total
-        state, _ , _= game.get_state()
-        if state is None:
-            break 
+                
+            # Take action and add reward to total
+            next_state, reward, action = game.get_state()
+            
+            # Update total
+            if type(q_values) != list:
+                q_values = q_values.tolist()
+            else:
+                 q_values = model.predict(state).tolist()
 
+            if next_state is None:
+                break
+            
+            #remove first element from memory
+            if len(memory) >= memory_size:
+                memory.pop(0)
+            memory.append((state, action, next_state, reward, next_state is None))
+            
+            model.replay(memory, replay_size, gamma)
+            
+            state = next_state
+        
+        if (episode % ((episodes-1)/10)) == 0 and episode != 0:
+            torch.save(model, "model" + str(episode) + title + ".mdl")
+
+# %%
 def main():
     args = sys.argv[1:]
-    model = torch.load(args[0])
-    q_execute(model, port=int(args[1]))
+    model = DQN_replay(hidden_dim=int(args[3]))
+    q_learning_replay(model, episodes=int(args[0])+1, port=int(args[1]), title=args[2])
 
 if __name__ == "__main__":
     main()
-

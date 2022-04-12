@@ -11,6 +11,7 @@ import java.util.List;
 
 import engine.es.ucm.fdi.ici.Action;
 import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.Constants;
 import engine.pacman.game.Constants.DM;
 import engine.pacman.game.Constants.GHOST;
 import engine.pacman.game.Constants.MOVE;
@@ -21,12 +22,13 @@ public class MsPacMan extends PacmanController implements Action {
 	private BufferedReader fromServer;
 	private PrintWriter toServer;
 	private Game game;
-	private static int maxDistance = 500;
+	private static int maxValue = 500;
 	private MOVE lastMoveMade;
 	private int lastScore;
 	private int lastLives;
 	private int lastLevel;
 	private int lastTime;
+	private int lastGhosts;
 	private String name;
 
 	public MsPacMan(Socket socket, String name) {
@@ -36,6 +38,7 @@ public class MsPacMan extends PacmanController implements Action {
 		this.lastLives = 3;
 		this.lastLevel = 3;
 		this.lastTime = 0;
+		this.lastGhosts=0;
 		try {
 			fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			toServer = new PrintWriter(socket.getOutputStream(), true);
@@ -60,18 +63,25 @@ public class MsPacMan extends PacmanController implements Action {
 		List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
 		List<Integer> distGhosts = new ArrayList<>();
+		List<Integer> edibleTimeGhosts = new ArrayList<>();
 		for (GHOST g : lGhost) {
-			if (g == null)
-				distGhosts.add(maxDistance);
-			else
+			if (g == null) {
+				distGhosts.add(maxValue);
+				edibleTimeGhosts.add(maxValue);
+			}		
+			else {
 				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
+				edibleTimeGhosts.add(game.getGhostEdibleTime(g));
+			}
+				
 		}
-		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts + ";"
+		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts +"/" + edibleTimeGhosts + ";"
 				+ calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 	}
-
-	private int calculateReward() {
+	
+/*
+ *private int calculateReward() {
 		int currentScore = game.getScore();
 		int rewardForPills = currentScore - lastScore;
 		lastScore = currentScore;
@@ -89,6 +99,30 @@ public class MsPacMan extends PacmanController implements Action {
 		lastLevel = currentLevel;
 		
 		return rewardForPills + rewardForLives + rewardForTime + rewardForLevel;
+	}
+ */
+	private int calculateReward() {
+		int currentScore = game.getNumberOfActivePills();
+		int rewardForPills =(currentScore - lastScore)*10;
+		lastScore = currentScore;
+		
+		int currentGhosts=game.getNumGhostsEaten();
+		int rewardForGhosts= (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
+		lastGhosts= currentGhosts;
+		
+		int currentLives = game.getPacmanNumberOfLivesRemaining();
+		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
+		lastLives = currentLives;
+		
+		int currentTime = game.getTotalTime();
+		int rewardForTime = (lastTime - currentTime)*10;
+		lastTime = currentTime;
+		
+		int currentLevel = game.getCurrentLevel();
+		int rewardForLevel = (currentLevel > lastLevel) ? 100 : 0;
+		lastLevel = currentLevel;
+		
+		return rewardForPills + rewardForGhosts + rewardForLives + rewardForTime + rewardForLevel;
 	}
 	
 	private MOVE recieveAction(int msPacManNode) {
@@ -115,7 +149,7 @@ public class MsPacMan extends PacmanController implements Action {
 
 	private List<Integer> getDistanceToNearestPills(int msPacManNode) {
 
-		List<Integer> l = Arrays.asList(new Integer[] { maxDistance, maxDistance, maxDistance, maxDistance });
+		List<Integer> l = Arrays.asList(new Integer[] { maxValue, maxValue, maxValue, maxValue });
 
 		for (MOVE m : game.getPossibleMoves(msPacManNode)) {
 			l.set(m.ordinal(), getDistanceToNearestPill(m, msPacManNode));
@@ -140,7 +174,7 @@ public class MsPacMan extends PacmanController implements Action {
 
 	private List<Integer> getDistanceToNearestPowerPills(int msPacManNode) {
 
-		List<Integer> l = Arrays.asList(new Integer[] { maxDistance, maxDistance, maxDistance, maxDistance });
+		List<Integer> l = Arrays.asList(new Integer[] { maxValue, maxValue, maxValue, maxValue });
 
 		for (MOVE m : game.getPossibleMoves(msPacManNode)) {
 			l.set(m.ordinal(), getDistanceToNearestPowerPill(m, msPacManNode));
@@ -159,7 +193,7 @@ public class MsPacMan extends PacmanController implements Action {
 				minDistance = distance;
 		}
 		if (minDistance == Integer.MAX_VALUE)
-			minDistance = maxDistance;
+			minDistance = maxValue;
 		return minDistance;
 	}
 

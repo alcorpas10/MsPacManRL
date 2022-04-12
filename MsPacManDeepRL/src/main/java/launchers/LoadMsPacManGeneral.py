@@ -36,9 +36,9 @@ class Game():
             list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
             list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
             list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))
-            
+            list_edible_time_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
 
-            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts
+            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_time_ghosts
             
             max_num = 500
             min_num = 0
@@ -52,7 +52,7 @@ class Game():
             f.write(str(self.error_num) + ": " + data + "\n")
             f.close()
             self.error_num += 1
-            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
+            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
             reward = 0
             action = 0
         return next_state, reward, action
@@ -60,13 +60,14 @@ class Game():
     def send_action(self, action1, action2):
         self.conn.send(bytes(str(action1) + ";" + str(action2) + "\n",'UTF-8'))
 
-
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=12, action_dim=4, hidden_dim=8, lr=0.0005):
+    def __init__(self, state_dim=16, action_dim=4, hidden_dim=8, lr=0.0005):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
+                        torch.nn.LeakyReLU(),
+                        torch.nn.Linear(hidden_dim,hidden_dim),
                         torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr) #cambiar
@@ -116,7 +117,7 @@ class DQN_replay(DQN):
         
             
             self.update(states.tolist(), all_q_values.tolist())
-
+            
 def q_execute(model, port=38514):
     """Deep Q Learning algorithm using the DQN. """
     game = Game(port=port)
