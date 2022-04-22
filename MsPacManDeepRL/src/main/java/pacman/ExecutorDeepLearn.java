@@ -375,6 +375,7 @@ public class ExecutorDeepLearn {
 			try {
 				game = setupGameTrainNotEdible();
 				precompute(pacManController, ghostControllerCopy);
+				pacManController.init(game);
 				while (!game.gameOver()) {
 					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
 						break;
@@ -418,6 +419,7 @@ public class ExecutorDeepLearn {
 			try {
 				game = setupGameTrainEdible();
 				precompute(pacManController, ghostControllerCopy);
+				pacManController.init(game);
 				while (!game.gameOver()) {
 					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
 						break;
@@ -460,6 +462,7 @@ public class ExecutorDeepLearn {
 			try {
 				game = setupGame();
 				precompute(pacManController, ghostControllerCopy);
+				pacManController.init(game);
 				while (!game.gameOver()) {
 					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
 						break;

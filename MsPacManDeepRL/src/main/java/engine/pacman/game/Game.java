@@ -137,6 +137,7 @@ public final class Game {
 
 	private int ghostDefaultEdibleTime = 0;
 	private boolean isTraining;
+	private boolean isEdible;
 
 	/**
 	 * Instantiates a new game. The seed is used to initialise the pseudo-random
@@ -181,6 +182,7 @@ public final class Game {
 
 	public Game(long seed, int initialMaze, Messenger messenger, POType poType, int sightLimit, boolean training,
 			boolean edible) {
+		this.isEdible=edible;
 		if (edible)
 			this.ghostDefaultEdibleTime = Integer.MAX_VALUE;
 		this.isTraining = training;
@@ -1357,33 +1359,7 @@ public final class Game {
 	/**
 	 * feast.
 	 */
-	/*
-	 * //FEAST WHERE GHOSTS DOESNT EXIT LAIR private void feast() { pacmanWasEaten =
-	 * false;
-	 * 
-	 * for (GHOST ghost : ghosts.keySet()) { ghostsEaten.put(ghost, false); }
-	 * 
-	 * for (Ghost ghost : ghosts.values()) { int distance =
-	 * getShortestPathDistance(internalPacman.currentNodeIndex,
-	 * ghost.currentNodeIndex);
-	 * 
-	 * if (distance <= EAT_DISTANCE && distance != -1) { if (ghost.edibleTime > 0)
-	 * //pac-man eats ghost { score += GHOST_EAT_SCORE * ghostEatMultiplier;
-	 * ghostEatMultiplier *= 2; ghost.edibleTime = this.ghostDefaultEdibleTime;
-	 * ghost.lairTime = Integer.MAX_VALUE; ghost.currentNodeIndex =
-	 * currentMaze.lairNodeIndex; ghost.lastMoveMade = MOVE.NEUTRAL;
-	 * 
-	 * ghostsEaten.put(ghost.type, true); } else //ghost eats pac-man {
-	 * internalPacman.numberOfLivesRemaining--; pacmanWasEaten = true;
-	 * 
-	 * if (internalPacman.numberOfLivesRemaining <= 0) { gameOver = true; } else {
-	 * levelReset(); }
-	 * 
-	 * return; } } } for (Ghost ghost : ghosts.values()) { if (ghost.edibleTime > 0)
-	 * { ghost.edibleTime--; } } }
-	 */
-	// FEAST WHERE GHOSTS EXIT LAIR
-
+	//FEAST COMBINED
 	private void feast() {
 		pacmanWasEaten = false;
 
@@ -1395,13 +1371,18 @@ public final class Game {
 			int distance = getShortestPathDistance(internalPacman.currentNodeIndex, ghost.currentNodeIndex);
 
 			if (distance <= EAT_DISTANCE && distance != -1) {
-				if (ghost.edibleTime > 0) // pac-man eats ghost
+				if (ghost.edibleTime > 0)// pac-man eats ghost
 				{
 					score += GHOST_EAT_SCORE * ghostEatMultiplier;
 					ghostEatMultiplier *= 2;
 					ghost.edibleTime = this.ghostDefaultEdibleTime;
-					ghost.lairTime = (int) (COMMON_LAIR_TIME
-							* (Math.pow(LAIR_REDUCTION, levelCount % LEVEL_RESET_REDUCTION)));
+					if(this.isEdible) {
+						ghost.lairTime = Integer.MAX_VALUE;
+					}
+					else {
+						ghost.lairTime = (int) (COMMON_LAIR_TIME
+								* (Math.pow(LAIR_REDUCTION, levelCount % LEVEL_RESET_REDUCTION)));
+					}
 					ghost.currentNodeIndex = currentMaze.lairNodeIndex;
 					ghost.lastMoveMade = MOVE.NEUTRAL;
 
@@ -1427,6 +1408,99 @@ public final class Game {
 			}
 		}
 	}
+//	
+//	// FEAST WHERE GHOSTS DOESNT EXIT LAIR
+//	private void feast() {
+//		pacmanWasEaten = false;
+//
+//		for (GHOST ghost : ghosts.keySet()) {
+//			ghostsEaten.put(ghost, false);
+//		}
+//
+//		for (Ghost ghost : ghosts.values()) {
+//			int distance = getShortestPathDistance(internalPacman.currentNodeIndex, ghost.currentNodeIndex);
+//
+//			if (distance <= EAT_DISTANCE && distance != -1) {
+//				if (ghost.edibleTime > 0)// pac-man eats ghost
+//				{
+//					score += GHOST_EAT_SCORE * ghostEatMultiplier;
+//					ghostEatMultiplier *= 2;
+//					ghost.edibleTime = this.ghostDefaultEdibleTime;
+//					
+//					ghost.lairTime = Integer.MAX_VALUE;
+//					ghost.currentNodeIndex = currentMaze.lairNodeIndex;
+//					ghost.lastMoveMade = MOVE.NEUTRAL;
+//
+//					ghostsEaten.put(ghost.type, true);
+//				} else // ghost eats pac-man
+//				{
+//					internalPacman.numberOfLivesRemaining--;
+//					pacmanWasEaten = true;
+//
+//					if (internalPacman.numberOfLivesRemaining <= 0) {
+//						gameOver = true;
+//					} else {
+//						levelReset();
+//					}
+//
+//					return;
+//				}
+//			}
+//		}
+//		for (Ghost ghost : ghosts.values()) {
+//			if (ghost.edibleTime > 0) {
+//				ghost.edibleTime--;
+//			}
+//		}
+//	}
+//	
+//	
+//	
+//	// FEAST WHERE GHOSTS EXIT LAIR
+//
+//	private void feast() {
+//		pacmanWasEaten = false;
+//
+//		for (GHOST ghost : ghosts.keySet()) {
+//			ghostsEaten.put(ghost, false);
+//		}
+//
+//		for (Ghost ghost : ghosts.values()) {
+//			int distance = getShortestPathDistance(internalPacman.currentNodeIndex, ghost.currentNodeIndex);
+//
+//			if (distance <= EAT_DISTANCE && distance != -1) {
+//				if (ghost.edibleTime > 0) // pac-man eats ghost
+//				{
+//					score += GHOST_EAT_SCORE * ghostEatMultiplier;
+//					ghostEatMultiplier *= 2;
+//					ghost.edibleTime = this.ghostDefaultEdibleTime;
+//					ghost.lairTime = (int) (COMMON_LAIR_TIME
+//							* (Math.pow(LAIR_REDUCTION, levelCount % LEVEL_RESET_REDUCTION)));
+//					ghost.currentNodeIndex = currentMaze.lairNodeIndex;
+//					ghost.lastMoveMade = MOVE.NEUTRAL;
+//
+//					ghostsEaten.put(ghost.type, true);
+//				} else // ghost eats pac-man
+//				{
+//					internalPacman.numberOfLivesRemaining--;
+//					pacmanWasEaten = true;
+//
+//					if (internalPacman.numberOfLivesRemaining <= 0) {
+//						gameOver = true;
+//					} else {
+//						levelReset();
+//					}
+//
+//					return;
+//				}
+//			}
+//		}
+//		for (Ghost ghost : ghosts.values()) {
+//			if (ghost.edibleTime > 0) {
+//				ghost.edibleTime--;
+//			}
+//		}
+//	}
 
 	/**
 	 * _check level state.

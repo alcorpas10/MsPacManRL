@@ -24,21 +24,22 @@ public class MsPacMan extends PacmanController implements Action {
 	private Game game;
 	private static int maxValue = 500;
 	private MOVE lastMoveMade;
-	private int lastScore;
+	private int lastPills;
 	private int lastLives;
 	private int lastLevel;
 	private int lastTime;
 	private int lastGhosts;
+	private int lastPPills;
+	private int lastScore;
 	private String name;
 
 	public MsPacMan(Socket socket, String name) {
 		this.name = name;
 		this.lastMoveMade = MOVE.UP;
-		this.lastScore = 0;
-		this.lastLives = 3;
-		this.lastLevel = 3;
 		this.lastTime = 0;
-		this.lastGhosts=0;
+		this.lastGhosts = 0;
+		this.lastScore=0;
+
 		try {
 			fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			toServer = new PrintWriter(socket.getOutputStream(), true);
@@ -46,7 +47,13 @@ public class MsPacMan extends PacmanController implements Action {
 			e.printStackTrace();
 		}
 	}
-
+	public void init(Game game) {
+		this.lastPills=game.getNumberOfPills();
+		this.lastPPills= game.getNumberOfPowerPills();
+		this.lastLevel = game.getCurrentLevel();
+		this.lastLives = game.getPacmanNumberOfLivesRemaining();
+	}
+	
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
 		int msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -58,7 +65,10 @@ public class MsPacMan extends PacmanController implements Action {
 		return MOVE.NEUTRAL;
 	}
 
-	private void sendState(int msPacManNode) {
+	/*
+	 	//SendState General
+	 	
+	  	private void sendState(int msPacManNode) {
 		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 		List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
@@ -68,63 +78,118 @@ public class MsPacMan extends PacmanController implements Action {
 			if (g == null) {
 				distGhosts.add(maxValue);
 				edibleTimeGhosts.add(maxValue);
-			}		
-			else {
+			} else {
 				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
 				edibleTimeGhosts.add(game.getGhostEdibleTime(g));
 			}
-				
+
 		}
-		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts +"/" + edibleTimeGhosts + ";"
+		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts + "/" + edibleTimeGhosts + ";"
 				+ calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 	}
-	
-/*
- *private int calculateReward() {
-		int currentScore = game.getScore();
-		int rewardForPills = currentScore - lastScore;
-		lastScore = currentScore;
+	*/
+	//SendState Edible & Not Edible
+	private void sendState(int msPacManNode) {
+		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
+		List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
+		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
+		List<Integer> distGhosts = new ArrayList<>();
 		
-		int currentLives = game.getPacmanNumberOfLivesRemaining();
-		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
-		lastLives = currentLives;
-		
-		int currentTime = game.getTotalTime();
-		int rewardForTime = lastTime - currentTime;
-		lastTime = currentTime;
-		
-		int currentLevel = game.getCurrentLevel();
-		int rewardForLevel = (currentLevel > lastLevel) ? 100 : 0;
-		lastLevel = currentLevel;
-		
-		return rewardForPills + rewardForLives + rewardForTime + rewardForLevel;
+		for (GHOST g : lGhost) {
+			if (g == null) {
+				distGhosts.add(maxValue);
+			} else {
+				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
+			}
+
+		}
+		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts  + ";"
+				+ calculateReward() + ";" + lastMoveMade.ordinal());
+		toServer.flush();
 	}
- */
+
+
+	
+	
+	/*//Reward NotEdible Ghosts
 	private int calculateReward() {
-		int currentScore = game.getNumberOfActivePills();
-		int rewardForPills =(currentScore - lastScore)*10;
+		int currentScore = game.getScore(); 
+		int rewardForScore = currentScore - lastScore; 
 		lastScore = currentScore;
-		
-		int currentGhosts=game.getNumGhostsEaten();
-		int rewardForGhosts= (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
-		lastGhosts= currentGhosts;
-		
+
 		int currentLives = game.getPacmanNumberOfLivesRemaining();
 		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
 		lastLives = currentLives;
-		
+
 		int currentTime = game.getTotalTime();
-		int rewardForTime = (lastTime - currentTime)*10;
+		int rewardForTime = (lastTime - currentTime) * 10;
 		lastTime = currentTime;
-		
+
 		int currentLevel = game.getCurrentLevel();
-		int rewardForLevel = (currentLevel > lastLevel) ? 100 : 0;
+		int rewardForLevel = (currentLevel > lastLevel) ? 1000 : 0;
 		lastLevel = currentLevel;
-		
+
+		return rewardForScore + rewardForLives + rewardForTime + rewardForLevel;
+	}*/
+	
+	//Reward Edible Ghosts 
+	private int calculateReward() {
+		int currentPills = game.getNumberOfActivePills();
+		int aux = (lastPills - currentPills) * 10;
+		int rewardForPills= (aux>0) ? aux : 0;
+		lastPills = currentPills;
+
+		int currentGhosts = game.getNumGhostsEaten();
+		int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
+		lastGhosts = currentGhosts;
+
+		int currentLives = game.getPacmanNumberOfLivesRemaining();
+		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
+		lastLives = currentLives;
+
+		int currentTime = game.getTotalTime();
+		int rewardForTime = (lastTime - currentTime) * 10;
+		lastTime = currentTime;
+
+		int currentLevel = game.getCurrentLevel();
+		int rewardForLevel = (currentLevel > lastLevel) ? 1000 : 0;
+		lastLevel = currentLevel;
+
 		return rewardForPills + rewardForGhosts + rewardForLives + rewardForTime + rewardForLevel;
 	}
-	
+	/*
+	//CalculatReward General 
+	private int calculateReward() {
+		int currentPills = game.getNumberOfActivePills();
+		int aux = (lastPills - currentPills) * 10;
+		int rewardForPills= (aux>0) ? aux : 0;
+		lastPills = currentPills;
+		
+		int currentPPills = game.getNumberOfActivePowerPills();
+		int aux2 = (lastPPills - currentPPills ) * 10;
+		int rewardForPPills= (aux2>0) ? aux2 : 0;
+		lastPPills = currentPPills;
+
+		int currentGhosts = game.getNumGhostsEaten();
+		int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
+		lastGhosts = currentGhosts;
+
+		int currentLives = game.getPacmanNumberOfLivesRemaining();
+		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
+		lastLives = currentLives;
+
+		int currentTime = game.getTotalTime();
+		int rewardForTime = (lastTime - currentTime) * 10;
+		lastTime = currentTime;
+
+		int currentLevel = game.getCurrentLevel();
+		int rewardForLevel = (currentLevel > lastLevel) ? 1000 : 0;
+		lastLevel = currentLevel;
+
+		return rewardForPills + rewardForGhosts + rewardForLives + rewardForTime + rewardForLevel+ rewardForPPills;
+	}	
+	*/
 	private MOVE recieveAction(int msPacManNode) {
 		try {
 			String data = fromServer.readLine();
@@ -137,7 +202,7 @@ public class MsPacMan extends PacmanController implements Action {
 				lastMoveMade = m1;
 				return m1;
 			} else {
-				
+
 				lastMoveMade = m2;
 				return m2;
 			}
@@ -238,11 +303,12 @@ public class MsPacMan extends PacmanController implements Action {
 	public void gameOver() {
 		toServer.print("gameOver;" + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
-		this.lastScore = 0;
+		this.lastPills = 0;
 	}
+
 	public void getOk() {
 		try {
-			String data = fromServer.readLine();  //Waits OK
+			String data = fromServer.readLine(); // Waits OK
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

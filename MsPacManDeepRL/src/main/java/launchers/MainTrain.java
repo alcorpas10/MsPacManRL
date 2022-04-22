@@ -15,7 +15,7 @@ public class MainTrain {
 	
 	public static void main(String[] args) {
 		ExecutorDeepLearn executor = new ExecutorDeepLearn.Builder()
-	            .setTickLimit(4000)
+	            .setTickLimit(250)
 	            .setVisual(true)
 	            .setScaleFactor(3.0)
 	            .build();
@@ -27,7 +27,7 @@ public class MainTrain {
 			MsPacMan pacMan = new MsPacMan(socket, "");
 	        GhostController ghosts = new GhostAlgorithmic();
 	        
-	        System.out.println(executor.runEpisodesTrain(pacMan, ghosts, "Deep Learn"));
+	        System.out.println(executor.runEpisodesTrainEdible(pacMan, ghosts, "Deep Learn"));
 			
         } catch (IOException e1) {
             e1.printStackTrace();
