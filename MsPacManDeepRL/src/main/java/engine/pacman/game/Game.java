@@ -138,6 +138,7 @@ public final class Game {
 	private int ghostDefaultEdibleTime = 0;
 	private boolean isTraining;
 	private boolean isEdible;
+	private int contGhosts = 0;
 
 	/**
 	 * Instantiates a new game. The seed is used to initialise the pseudo-random
@@ -1373,6 +1374,7 @@ public final class Game {
 			if (distance <= EAT_DISTANCE && distance != -1) {
 				if (ghost.edibleTime > 0)// pac-man eats ghost
 				{
+					contGhosts++;
 					score += GHOST_EAT_SCORE * ghostEatMultiplier;
 					ghostEatMultiplier *= 2;
 					ghost.edibleTime = this.ghostDefaultEdibleTime;
@@ -1552,6 +1554,10 @@ public final class Game {
 		}
 
 		return count;
+	}
+	
+	public int getNumberOfGhostsEaten() {
+		return contGhosts;
 	}
 
 	/**

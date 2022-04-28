@@ -65,10 +65,8 @@ public class MsPacMan extends PacmanController implements Action {
 		return MOVE.NEUTRAL;
 	}
 
-	/*
-	 	//SendState General
-	 	
-	  	private void sendState(int msPacManNode) {
+ 	//SendState General
+  	/*private void sendState(int msPacManNode) {
 		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 		List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
@@ -87,8 +85,8 @@ public class MsPacMan extends PacmanController implements Action {
 		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts + "/" + edibleTimeGhosts + ";"
 				+ calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
-	}
-	*/
+	}*/
+	
 	//SendState Edible & Not Edible
 	private void sendState(int msPacManNode) {
 		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
@@ -112,8 +110,8 @@ public class MsPacMan extends PacmanController implements Action {
 
 	
 	
-	/*//Reward NotEdible Ghosts
-	private int calculateReward() {
+	//Reward NotEdible Ghosts
+	/*private int calculateReward() {
 		int currentScore = game.getScore(); 
 		int rewardForScore = currentScore - lastScore; 
 		lastScore = currentScore;
@@ -123,7 +121,7 @@ public class MsPacMan extends PacmanController implements Action {
 		lastLives = currentLives;
 
 		int currentTime = game.getTotalTime();
-		int rewardForTime = (lastTime - currentTime) * 10;
+		int rewardForTime = (lastTime - currentTime);
 		lastTime = currentTime;
 
 		int currentLevel = game.getCurrentLevel();
@@ -140,16 +138,16 @@ public class MsPacMan extends PacmanController implements Action {
 		int rewardForPills= (aux>0) ? aux : 0;
 		lastPills = currentPills;
 
-		int currentGhosts = game.getNumGhostsEaten();
+		int currentGhosts = game.getNumberOfGhostsEaten();
 		int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
 		lastGhosts = currentGhosts;
 
 		int currentLives = game.getPacmanNumberOfLivesRemaining();
-		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
+		int rewardForLives = (currentLives < lastLives) ? -500 : 0;
 		lastLives = currentLives;
 
 		int currentTime = game.getTotalTime();
-		int rewardForTime = (lastTime - currentTime) * 10;
+		int rewardForTime = (lastTime - currentTime) * 3;
 		lastTime = currentTime;
 
 		int currentLevel = game.getCurrentLevel();
@@ -158,29 +156,29 @@ public class MsPacMan extends PacmanController implements Action {
 
 		return rewardForPills + rewardForGhosts + rewardForLives + rewardForTime + rewardForLevel;
 	}
-	/*
-	//CalculatReward General 
-	private int calculateReward() {
+	
+	//CalculateReward General 
+	/*private int calculateReward() {
 		int currentPills = game.getNumberOfActivePills();
 		int aux = (lastPills - currentPills) * 10;
 		int rewardForPills= (aux>0) ? aux : 0;
 		lastPills = currentPills;
 		
 		int currentPPills = game.getNumberOfActivePowerPills();
-		int aux2 = (lastPPills - currentPPills ) * 10;
+		int aux2 = (lastPPills - currentPPills ) * 20;
 		int rewardForPPills= (aux2>0) ? aux2 : 0;
 		lastPPills = currentPPills;
 
-		int currentGhosts = game.getNumGhostsEaten();
+		int currentGhosts = game.getNumberOfGhostsEaten();
 		int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
 		lastGhosts = currentGhosts;
 
 		int currentLives = game.getPacmanNumberOfLivesRemaining();
-		int rewardForLives = (currentLives < lastLives) ? -100 : 0;
+		int rewardForLives = (currentLives < lastLives) ? -500 : 0;
 		lastLives = currentLives;
 
 		int currentTime = game.getTotalTime();
-		int rewardForTime = (lastTime - currentTime) * 10;
+		int rewardForTime = (lastTime - currentTime);
 		lastTime = currentTime;
 
 		int currentLevel = game.getCurrentLevel();
@@ -188,8 +186,8 @@ public class MsPacMan extends PacmanController implements Action {
 		lastLevel = currentLevel;
 
 		return rewardForPills + rewardForGhosts + rewardForLives + rewardForTime + rewardForLevel+ rewardForPPills;
-	}	
-	*/
+	}*/
+	
 	private MOVE recieveAction(int msPacManNode) {
 		try {
 			String data = fromServer.readLine();

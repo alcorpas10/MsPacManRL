@@ -3,6 +3,7 @@ package launchers;
 import engine.pacman.controllers.GhostController;
 import ghosts.GhostAggressive;
 import ghosts.GhostAlgorithmic;
+import ghosts.GhostNormal;
 import ghosts.GhostRandom;
 import pacman.ExecutorDeepLearn;
 
@@ -16,7 +17,7 @@ public class MainFSM {
 				.setScaleFactor(3.0)
 				.build();
 
-		GhostController ghosts = new GhostAlgorithmic();
+		GhostController ghosts = new GhostNormal();
 
 		System.out.println(executor.runGameFSM(ghosts, 40));
 	}

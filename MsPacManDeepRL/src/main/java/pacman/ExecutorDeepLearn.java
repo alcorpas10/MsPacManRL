@@ -263,18 +263,15 @@ public class ExecutorDeepLearn {
 	}
 
 	private Game setupGame() {
-		return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, false, false)
-				: new Game(rnd.nextLong(), 0, null, poType, sightLimit, false, false);
+		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, false, false);
 	}
 
 	private Game setupGameTrainNotEdible() {
-		return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true, false)
-				: new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, false);
+		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, false);
 	}
 
 	private Game setupGameTrainEdible() {
-		return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true, true)
-				: new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, true);
+		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, true);
 	}
 
 	private Game setupPillsGame() {
@@ -341,7 +338,6 @@ public class ExecutorDeepLearn {
 			handlePeek(game);
 			game.advanceGame(pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
 					ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
-
 			// pacManController.nextStep();
 			try {
 				Thread.sleep(delay);
