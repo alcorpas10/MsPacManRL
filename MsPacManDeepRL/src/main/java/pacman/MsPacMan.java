@@ -87,8 +87,8 @@ public class MsPacMan extends PacmanController implements Action {
 		toServer.flush();
 	}*/
 	
-	//SendState Edible & Not Edible
-	private void sendState(int msPacManNode) {
+	//SendState Not Edible
+	/*private void sendState(int msPacManNode) {
 		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 		List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
@@ -105,10 +105,23 @@ public class MsPacMan extends PacmanController implements Action {
 		toServer.print(distPills + "/" + distPowerPills + "/" + distGhosts  + ";"
 				+ calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
-	}
-
-
+	}*/
 	
+	//SendState Edible
+	private void sendState(int msPacManNode) {
+		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
+		List<Integer> distGhosts = new ArrayList<>();
+		
+		for (GHOST g : lGhost) {
+			if (g == null) {
+				distGhosts.add(maxValue);
+			} else {
+				distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
+			}
+		}
+		toServer.print(distGhosts + ";" + calculateReward() + ";" + lastMoveMade.ordinal());
+		toServer.flush();
+	}
 	
 	//Reward NotEdible Ghosts
 	/*private int calculateReward() {
@@ -133,28 +146,15 @@ public class MsPacMan extends PacmanController implements Action {
 	
 	//Reward Edible Ghosts 
 	private int calculateReward() {
-		int currentPills = game.getNumberOfActivePills();
-		int aux = (lastPills - currentPills) * 10;
-		int rewardForPills= (aux>0) ? aux : 0;
-		lastPills = currentPills;
-
 		int currentGhosts = game.getNumberOfGhostsEaten();
 		int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
 		lastGhosts = currentGhosts;
-
-		int currentLives = game.getPacmanNumberOfLivesRemaining();
-		int rewardForLives = (currentLives < lastLives) ? -500 : 0;
-		lastLives = currentLives;
 
 		int currentTime = game.getTotalTime();
 		int rewardForTime = (lastTime - currentTime) * 3;
 		lastTime = currentTime;
 
-		int currentLevel = game.getCurrentLevel();
-		int rewardForLevel = (currentLevel > lastLevel) ? 1000 : 0;
-		lastLevel = currentLevel;
-
-		return rewardForPills + rewardForGhosts + rewardForLives + rewardForTime + rewardForLevel;
+		return rewardForGhosts + rewardForTime;
 	}
 	
 	//CalculateReward General 
