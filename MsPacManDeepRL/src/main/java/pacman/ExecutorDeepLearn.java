@@ -326,7 +326,7 @@ public class ExecutorDeepLearn {
 		Game game = setupGame();
 
 		precompute(pacManController, ghostController);
-
+		pacManController.init(game);
 		GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
 
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -387,7 +387,7 @@ public class ExecutorDeepLearn {
 				ticks.add(game.getCurrentLevelTime());
 				i++;
 				postcompute(pacManController, ghostController);
-				System.out.println("Game finished: " + i + "   " + description);
+				//System.out.println("Game finished: " + i + "   " + description);
 			} catch (Exception e) {
 				System.err.println("ERROR runExperiment: " + pacManController.getClass().getCanonicalName() + " vs "
 						+ ghostControllerCopy.getClass().getCanonicalName());
@@ -431,7 +431,7 @@ public class ExecutorDeepLearn {
 				ticks.add(game.getCurrentLevelTime());
 				i++;
 				postcompute(pacManController, ghostController);
-				System.out.println("Game finished: " + i + "   " + description);
+				//System.out.println("Game finished: " + i + "   " + description);
 			} catch (Exception e) {
 				System.err.println("ERROR runExperiment: " + pacManController.getClass().getCanonicalName() + " vs "
 						+ ghostControllerCopy.getClass().getCanonicalName());
@@ -474,7 +474,7 @@ public class ExecutorDeepLearn {
 				ticks.add(game.getCurrentLevelTime());
 				i++;
 				postcompute(pacManController, ghostController);
-				System.out.println("Game finished: " + i + "   " + description);
+				//System.out.println("Game finished: " + i + "   " + description);
 			} catch (Exception e) {
 				System.err.println("ERROR runExperiment: " + pacManController.getClass().getCanonicalName() + " vs "
 						+ ghostControllerCopy.getClass().getCanonicalName());

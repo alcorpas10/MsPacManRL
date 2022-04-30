@@ -29,8 +29,8 @@ public class MsPacManFSM extends PacmanController {
 			e.printStackTrace();
 		}
 		
-    	msPacManNotEdible = new MsPacMan(socketNotEdible, "MsPacManNotEdible");
-    	msPacManEdible = new MsPacMan(socketEdible, "MsPacManNotEdible");
+    	msPacManNotEdible = new MsPacMan(socketNotEdible, "MsPacManNotEdible", 1);
+    	msPacManEdible = new MsPacMan(socketEdible, "MsPacManEdible", 2);
 		
     	SimpleState edibleGhostState = new SimpleState("edibleGhostState", msPacManEdible);
     	SimpleState notEdibleGhostState = new SimpleState("notEdibleGhostState", msPacManNotEdible);

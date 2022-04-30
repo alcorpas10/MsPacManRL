@@ -894,6 +894,8 @@ public final class Game {
 
 		copy.ghostsEaten = new EnumMap<>(GHOST.class);
 		copy.ghosts = new EnumMap<>(GHOST.class);
+		
+		copy.contGhosts = contGhosts; // TODO anadido
 
 		for (GHOST ghostType : GHOST.values()) {
 			copy.ghosts.put(ghostType, ghosts.get(ghostType).copy());
