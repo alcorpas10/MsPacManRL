@@ -31,12 +31,12 @@ class Game():
                 self.conn.send(bytes("GAMEOVER\n",'UTF-8'))
                 return None, reward, action
             
-            next_state = list(map(int, lista[0].replace("[","").replace("]","").split(",")))
-                        
-            max_num = 500
-            min_num = 0
-
-            next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
+            state_list = lista[0].split("/")
+            
+            list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
+            list_dist_ghosts = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
+            
+            next_state = list_dist_pills + list_dist_ghosts
         
             
         except Exception as e:
@@ -117,13 +117,13 @@ def q_execute(model, port=38514):
     q_values = []
            
     # Reset state
-    state, _, _ = game.get_state()
+    state, reward, _ = game.get_state()
     
     while True:
         # Add state and reward to a file TODO delete this
-        # f = open("state_reward_file.txt" ,"a+")
-        # f.write(str(state) + ";" + str(reward) + "\n")
-        # f.close()
+        #f = open("state_reward_file.txt" ,"a+")
+        #f.write(str(state) + ";" + str(reward) + "\n")
+        #f.close()
 
         # Implement greedy search policy to explore the state space 
         q_values = model.predict(state)
@@ -131,7 +131,7 @@ def q_execute(model, port=38514):
         game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
 
         # Take action and add reward to total
-        state, _, _= game.get_state()
+        state, reward, _= game.get_state()
         if state is None:
             break 
 

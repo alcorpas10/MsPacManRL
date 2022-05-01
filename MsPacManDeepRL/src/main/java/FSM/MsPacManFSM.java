@@ -63,4 +63,9 @@ public class MsPacManFSM extends PacmanController {
        	
     	return m;
     }
+
+	public void init(Game game) {
+		msPacManNotEdible.init(game);
+		msPacManEdible.init(game);
+	}
 }

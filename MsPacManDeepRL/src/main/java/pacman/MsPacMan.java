@@ -79,12 +79,12 @@ public class MsPacMan extends PacmanController implements Action {
 	private void sendState(int msPacManNode) {
 		List<GHOST> lGhost = getNearestGhosts(msPacManNode);
 		List<Integer> distGhosts = new ArrayList<>();
-
+		List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
+		
 		String output = null;
 
 		// General state
 		if (type == 0) {
-			List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 			List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 			List<Integer> edibleTimeGhosts = new ArrayList<>();
 
@@ -101,7 +101,6 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		// Not Edible state
 		else if (type == 1) {
-			List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 			List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 
 			for (GHOST g : lGhost) {
@@ -121,7 +120,7 @@ public class MsPacMan extends PacmanController implements Action {
 					distGhosts.add((int) game.getDistance(msPacManNode, game.getGhostCurrentNodeIndex(g), DM.PATH));
 				}
 			}
-			output = distGhosts + ";";
+			output = distPills + "/" + distGhosts + ";";
 		}
 		toServer.print(output + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
@@ -160,6 +159,11 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		// Edible reward
 		else {
+			int currentPills = game.getNumberOfActivePills();
+			int aux = (lastPills - currentPills) * 10;
+			int rewardForPills = (aux > 0) ? aux : 0;
+			lastPills = currentPills;
+			
 			int node = game.getPacmanCurrentNodeIndex();
 			int currentDistance = (lastNearestGhost != null) ? 
 					(int) game.getDistance(node, game.getGhostCurrentNodeIndex(lastNearestGhost), DM.PATH)
@@ -172,7 +176,7 @@ public class MsPacMan extends PacmanController implements Action {
 					(int) game.getDistance(node, game.getGhostCurrentNodeIndex(g), DM.PATH)	: maxValue;
 			lastNearestGhost = g;
 
-			reward = rewardForCloser;
+			reward = rewardForPills + rewardForCloser;
 		}
 		int currentTime = game.getTotalTime();
 		int rewardForTime = (lastTime - currentTime);

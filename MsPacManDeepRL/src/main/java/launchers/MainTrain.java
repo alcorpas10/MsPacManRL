@@ -11,7 +11,7 @@ import pacman.MsPacMan;
 public class MainTrain {
 	public static void main(String[] args) {
 		ExecutorDeepLearn executor = new ExecutorDeepLearn.Builder()
-				.setTickLimit(1000)
+				.setTickLimit(800)
 				.setVisual(true)
 				.setScaleFactor(3.0)
 				.build();

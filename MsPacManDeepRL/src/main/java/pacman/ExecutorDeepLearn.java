@@ -323,7 +323,7 @@ public class ExecutorDeepLearn {
 	 * @param delay            The delay between time-steps
 	 */
 	public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {
-		Game game = setupGame();
+		Game game = setupGameTrainEdible();
 
 		precompute(pacManController, ghostController);
 		pacManController.init(game);
@@ -493,7 +493,7 @@ public class ExecutorDeepLearn {
 		MsPacManFSM pacManController = new MsPacManFSM();
 
 		precompute(pacManController, ghostController);
-
+		pacManController.init(game);
 		GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
 
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
