@@ -1,4 +1,4 @@
-package es.ucm.fdi.ici;
+package engine.es.ucm.fdi.ici;
 /**
  * PacManEvaluatorTFG
  * Class to evaluate the MsPacMan developed
@@ -12,11 +12,12 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Vector;
 
-import Others.Executor;
-import pacman.controllers.Controller;
-import pacman.controllers.GhostController;
-import pacman.controllers.PacmanController;
-import pacman.game.util.Stats;
+import engine.pacman.controllers.Controller;
+import engine.pacman.controllers.GhostController;
+import engine.pacman.controllers.PacmanController;
+import engine.pacman.game.util.Stats;
+import pacman.ExecutorDeepLearn;
+
 
 public class PacManEvaluatorTFG {
 	
@@ -36,7 +37,7 @@ public class PacManEvaluatorTFG {
 	//ONLY FOR CBR
 	public static final int LIMIT = 2000;
 
-	private Executor executor;
+	private ExecutorDeepLearn executor;
 	private Properties properties;
 	private Vector<PacmanController> list_pacMan; 
 	private Vector<GhostController> list_ghosts;
@@ -76,7 +77,7 @@ public class PacManEvaluatorTFG {
 		Integer ticks = Integer.parseInt(properties.getProperty(KEY_TICKS_LIMIT));
 		Integer time =  Integer.parseInt(properties.getProperty(KEY_TIME_LIMIT));
 
-	       executor = new Executor.Builder()
+	       executor = new ExecutorDeepLearn.Builder()
 	    		    .setTickLimit(ticks)
 	    		    .setTimeLimit(time)
 	                .setVisual(false)
@@ -129,8 +130,9 @@ public class PacManEvaluatorTFG {
 		for(Controller<?> c: list_ghosts)
 			names_ghosts.add(c.getName());
 		
-		for(int numTrainings=1000;numTrainings<=10000000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos	
-			names_pacMan.add("MsPacManQLearn"+numTrainings);
+		int maxTrain = 1000000;
+		for(int numTrainings=maxTrain/10; numTrainings<=maxTrain; numTrainings+=(maxTrain/10)) {	
+			names_pacMan.add("MsPacManDQN"+numTrainings);
 		}
 		scores = new Scores(names_pacMan,names_ghosts);
 	    int p = 0;
@@ -153,13 +155,13 @@ public class PacManEvaluatorTFG {
     	int g=0;
     	
     	String ghostType;
-    	for(int numTrainings=1000;numTrainings<=10000000;numTrainings=numTrainings*10) {  //numTrainings cambiar segun los que usemos
+    	for(int numTrainings=maxTrain/10; numTrainings<=maxTrain; numTrainings+=(maxTrain/10)) {
     		for(GhostController ghosts: list_ghosts) {
                 try {  
                 	ghostType = ghosts.getClass().getName();
-    	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManQLearn"+numTrainings+" - " + ghostType, numTrainings, ghostType.replace("Others.Ghost", ""));
-    	    		scores.put("MsPacManQLearn"+numTrainings, ghosts.getName(), result[0]);
-    	    		g++; //TODO
+    	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManDQN"+numTrainings+" - " + ghostType, numTrainings, ghostType.replace("ghosts.Ghost", ""));
+    	    		scores.put("MsPacManDQN"+numTrainings, ghosts.getName(), result[0]);
+    	    		g++;
             	}catch(Exception e) {
             		System.err.println("Error executing pacman "+p+"  ghost: "+g);
             		System.err.println(e);	
@@ -191,13 +193,8 @@ public class PacManEvaluatorTFG {
 	
 	
 	public static void main(String[] args) {
-			PacManEvaluatorTFG evaluator = new PacManEvaluatorTFG();
-			Scores scores = evaluator.evaluate();
-			scores.printScoreAndRanking();
-
-
-		
-         
-        
+		PacManEvaluatorTFG evaluator = new PacManEvaluatorTFG();
+		Scores scores = evaluator.evaluate();
+		scores.printScoreAndRanking();
     }
 }
