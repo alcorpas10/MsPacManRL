@@ -29,6 +29,7 @@ import engine.pacman.game.comms.BasicMessenger;
 import engine.pacman.game.comms.Messenger;
 import engine.pacman.game.internal.POType;
 import engine.pacman.game.util.Stats;
+import launchers.PythonLauncher;
 
 /**
  * This class may be used to execute the game in timed or un-timed modes, with
@@ -312,6 +313,46 @@ public class ExecutorDeepLearn {
 		return new Stats[] { stats, ticks };
 	}
 
+	public Stats[] runFSMExperiment(GhostController ghostController, int trials, String description,int numTrainings, String ghostType) {
+        Stats stats = new Stats(description);
+        Stats ticks = new Stats(description + " Ticks");
+        GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+        Game game;
+
+        Long startTime = System.currentTimeMillis();
+        for (int i = 0; i < trials; ) {
+            try {
+                game = setupGame();
+                PythonLauncher.launchScript("models/"+description.split(" - ")[0]+"notEdible.mdl", "38514");
+                PythonLauncher.launchScript("models/"+description.split(" - ")[0]+"edible.mdl", "38515");
+                MsPacManFSM pacManController = new MsPacManFSM();
+                precompute(pacManController, ghostController);
+                while (!game.gameOver()) {
+                    if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+                        break;
+                    }
+                    handlePeek(game);
+                    game.advanceGame(
+                            pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+                            ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+                }
+                stats.add(game.getScore());
+                ticks.add(game.getCurrentLevelTime());
+                i++;
+                postcompute(pacManController, ghostController);
+                System.out.println("Game finished: " + i + "   " + description);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        long timeTaken = System.currentTimeMillis() - startTime;
+        stats.setMsTaken(timeTaken);
+        ticks.setMsTaken(timeTaken);
+
+        
+        return new Stats[]{stats, ticks};
+    }
+	
 	/**
 	 * Run a game in asynchronous mode: the game waits until a move is returned. In
 	 * order to slow thing down in case the controllers return very quickly, a time
