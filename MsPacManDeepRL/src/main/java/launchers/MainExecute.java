@@ -19,7 +19,7 @@ public class MainExecute {
 		try {
 			Socket socket = new Socket("localhost", 38514);
 			
-			MsPacMan pacMan = new MsPacMan(socket, "", 2);
+			MsPacMan pacMan = new MsPacMan(socket, "", 1);
 	        GhostController ghosts = new GhostNormal();
 	        
 	        System.out.println(executor.runGame(pacMan, ghosts, 40));

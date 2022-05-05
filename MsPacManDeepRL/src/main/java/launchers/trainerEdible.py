@@ -33,18 +33,17 @@ class Game():
                 self.conn.send(bytes("GAMEOVER\n",'UTF-8'))
                 return None, reward, action
                 
-            state_list = lista[0].split("/")
             
-            list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
-            #list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
-            list_dist_ghosts = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
+            list_dist_ghosts = list(map(int, lista[0].replace("[","").replace("]","").split(",")))
             
-            next_state = list_dist_pills + list_dist_ghosts
+            next_state = list_dist_ghosts
 
             max_num = 500
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
+                
+            #print(next_state, "Reward:", reward)
             
         except Exception as e:
             print(e)
@@ -52,7 +51,7 @@ class Game():
             f.write(str(self.error_num) + ": " + data + "\n")
             f.close()
             self.error_num += 1
-            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
+            next_state = [-38514, -38514, -38514, -38514]
             reward = 0
             action = 0
         return next_state, reward, action
@@ -63,7 +62,7 @@ class Game():
 # %%
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=8, action_dim=4, hidden_dim=8, lr=0.0005):
+    def __init__(self, state_dim=4, action_dim=4, hidden_dim=8, lr=0.0005):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),

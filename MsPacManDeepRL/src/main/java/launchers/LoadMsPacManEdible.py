@@ -33,10 +33,11 @@ class Game():
             
             state_list = lista[0].split("/")
             
-            list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
-            list_dist_ghosts = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
+            list_dist_ghosts = list(map(int, lista[0].replace("[","").replace("]","").split(",")))
             
-            next_state = list_dist_pills + list_dist_ghosts
+            print(data)
+
+            next_state = list_dist_ghosts
         
             
         except Exception as e:
@@ -45,7 +46,7 @@ class Game():
             f.write(str(self.error_num) + ": " + data + "\n")
             f.close()
             self.error_num += 1
-            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
+            next_state = [-38514, -38514, -38514, -38514]
             reward = 0
             action = 0
         return next_state, reward, action
