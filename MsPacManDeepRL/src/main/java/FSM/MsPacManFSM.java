@@ -41,9 +41,9 @@ public class MsPacManFSM extends PacmanController {
     	fsm.ready(notEdibleGhostState);
 	}
 	
-	public void gameOver() {
-		msPacManNotEdible.gameOver();
-		msPacManEdible.gameOver();
+	public void gameOver(Game game) {
+		msPacManNotEdible.gameOver(game);
+		msPacManEdible.gameOver(game);
 	}
 	
 	public void getOk() {

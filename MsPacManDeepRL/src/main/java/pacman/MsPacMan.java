@@ -232,14 +232,12 @@ public class MsPacMan extends PacmanController implements Action {
 
 	private int getDistanceToNearestPill(MOVE move, int msPacManNode) {
 		int[] pillsArray = game.getActivePillsIndices();
-		int distance, minDistance = Integer.MAX_VALUE, neigh = game.getNeighbour(msPacManNode, move);
+		int distance, minDistance = maxValue, neigh = game.getNeighbour(msPacManNode, move);
 		for (int pill : pillsArray) {
 			distance = (int) game.getDistance(neigh, pill, move, DM.PATH);
 			if (distance < minDistance)
 				minDistance = distance;
 		}
-		if (minDistance == Integer.MAX_VALUE)
-			minDistance = -1;
 		return minDistance;
 	}
 
@@ -257,15 +255,13 @@ public class MsPacMan extends PacmanController implements Action {
 
 	private int getDistanceToNearestPowerPill(MOVE move, int msPacManNode) {
 		int[] powerPillsArray = game.getActivePowerPillsIndices();
-		int distance, minDistance = Integer.MAX_VALUE, neigh = game.getNeighbour(msPacManNode, move);
+		int distance, minDistance = maxValue, neigh = game.getNeighbour(msPacManNode, move);
 		
 		for (int ppill : powerPillsArray) {
 			distance = (int) game.getDistance(neigh, ppill, move, DM.PATH);
 			if (distance < minDistance)
 				minDistance = distance;
 		}
-		if (minDistance == Integer.MAX_VALUE)
-			minDistance = maxValue;
 		return minDistance;
 	}
 
@@ -285,7 +281,7 @@ public class MsPacMan extends PacmanController implements Action {
 	}
 
 	private Pair<GHOST, Integer> getNearestGhost(MOVE move, int msPacManNode) {
-		int distance, minDistance = Integer.MAX_VALUE, pos, neigh = game.getNeighbour(msPacManNode, move);
+		int distance, minDistance = maxValue, pos, neigh = game.getNeighbour(msPacManNode, move);
 		GHOST nearestGhost = null;
 		for (GHOST ghost : GHOST.values()) {
 			pos = game.getGhostCurrentNodeIndex(ghost);
@@ -293,10 +289,10 @@ public class MsPacMan extends PacmanController implements Action {
 				if(neigh != -1)
 					distance = (int) game.getDistance(neigh, pos, move, DM.PATH);
 				else
-					distance = Integer.MAX_VALUE;
+					distance = maxValue;
 			}				
 			else
-				distance = Integer.MAX_VALUE;
+				distance = maxValue;
 			if (distance < minDistance) {
 				minDistance = distance;
 				nearestGhost = ghost;
@@ -332,7 +328,8 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 	}
 
-	public void gameOver() {
+	public void gameOver(Game game) {
+		this.game = game;
 		toServer.print("gameOver;" + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 		this.lastPills = 0;

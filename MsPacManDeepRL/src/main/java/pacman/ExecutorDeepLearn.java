@@ -389,7 +389,7 @@ public class ExecutorDeepLearn {
 				gv.repaint();
 			}
 		}
-		pacManController.gameOver();
+		pacManController.gameOver(getPacmanCopy(game));
 		pacManController.getOk();
 		System.out.println(game.getScore());
 
@@ -422,7 +422,7 @@ public class ExecutorDeepLearn {
 							pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
 							ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
 				}
-				pacManController.gameOver();
+				pacManController.gameOver(getPacmanCopy(game));
 				pacManController.getOk();
 				stats.add(game.getScore());
 				ticks.add(game.getCurrentLevelTime());
@@ -466,7 +466,7 @@ public class ExecutorDeepLearn {
 							pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
 							ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
 				}
-				pacManController.gameOver();
+				pacManController.gameOver(getPacmanCopy(game));
 				pacManController.getOk();
 				stats.add(game.getScore());
 				ticks.add(game.getCurrentLevelTime());
@@ -509,7 +509,7 @@ public class ExecutorDeepLearn {
 							pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
 							ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
 				}
-				pacManController.gameOver();
+				pacManController.gameOver(getPacmanCopy(game));
 				pacManController.getOk();
 				stats.add(game.getScore());
 				ticks.add(game.getCurrentLevelTime());
@@ -556,7 +556,7 @@ public class ExecutorDeepLearn {
 				gv.repaint();
 			}
 		}
-		pacManController.gameOver();
+		pacManController.gameOver(getPacmanCopy(game));
 		pacManController.getOk();
 		System.out.println(game.getScore());
 
