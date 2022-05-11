@@ -40,7 +40,7 @@ class Game():
 
             next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_time_ghosts
             
-            max_num = 500
+            max_num = 250
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
@@ -62,7 +62,7 @@ class Game():
 
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=16, action_dim=4, hidden_dim=8, lr=0.0005):
+    def __init__(self, state_dim=16, action_dim=4, hidden_dim=8, lr=0.0005, mom=0.9):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
@@ -70,7 +70,7 @@ class DQN():
                         torch.nn.Linear(hidden_dim,hidden_dim),
                         torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr) #cambiar
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=mom) #cambiar
         
     def update(self, state, y):
         """Update the weights of the network given a training sample. """
@@ -125,16 +125,18 @@ def q_execute(model, port=38514):
     q_values = []
            
     # Reset state
-    state, _, _ = game.get_state()
+    state, reward, _ = game.get_state()
     
     while True:
+        #print("\rState: {} | Reward: {}".format(state, reward))
+
         # Implement greedy search policy to explore the state space 
         q_values = model.predict(state)
         prediction = torch.topk(q_values, k=2)
         game.send_action(prediction[1].data[0].item(), prediction[1].data[1].item())
 
         # Take action and add reward to total
-        state, _ , _= game.get_state()
+        state, reward, _= game.get_state()
         if state is None:
             break 
 

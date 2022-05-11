@@ -97,7 +97,7 @@ public class MsPacMan extends PacmanController implements Action {
 
 			for (GHOST g : lGhost) {
 				if (g == null) {
-					edibleTimeGhosts.add(maxValue);
+					edibleTimeGhosts.add(0);
 				} else {
 					edibleTimeGhosts.add(game.getGhostEdibleTime(g));
 				}
@@ -154,7 +154,7 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		// Edible reward
 		
-		else {
+		/*else {
 		
 			Pair<List<GHOST>, List<Integer>> pairGhostDist = getNearestGhosts(this.game.getPacmanCurrentNodeIndex());
 			List<Integer> distGhosts = pairGhostDist.getSecond();
@@ -191,8 +191,7 @@ public class MsPacMan extends PacmanController implements Action {
 			int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
 			lastGhosts = currentGhosts;
 			return rewardForGhosts;
-			*/
-		}
+		}*/
 		
 		/*
 		int currentTime = game.getTotalTime();

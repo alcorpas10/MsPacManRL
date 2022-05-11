@@ -1382,6 +1382,8 @@ public final class Game {
 					ghost.edibleTime = this.ghostDefaultEdibleTime;
 					if(this.isEdible) {
 						ghost.lairTime = Integer.MAX_VALUE;
+						if (contGhosts >= 4)
+							gameOver = true;
 					}
 					else {
 						ghost.lairTime = (int) (COMMON_LAIR_TIME

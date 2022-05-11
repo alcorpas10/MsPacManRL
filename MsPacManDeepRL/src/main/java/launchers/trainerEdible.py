@@ -38,7 +38,7 @@ class Game():
             
             next_state = list_dist_ghosts
 
-            max_num = 500
+            max_num = 250
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
@@ -62,13 +62,13 @@ class Game():
 # %%
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=4, action_dim=4, hidden_dim=8, lr=0.0005):
+    def __init__(self, state_dim=4, action_dim=4, hidden_dim=8, lr=0.0005, mom=0.9):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
                         torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr) #cambiar
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=mom)
         
     def update(self, state, y):
         """Update the weights of the network given a training sample. """
@@ -124,9 +124,9 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
     q_values = []
     memory = []
     episode_i = 0
-    epsilon = 1
-    epsilon_aux = 11
-    episodeLimit = (episodes-1) * 5/8 + 1
+    #epsilon = 1
+    #epsilon_aux = 11
+    #episodeLimit = (episodes-1) * 5/8 + 1
 
     
     for episode in range(episodes):
@@ -171,16 +171,16 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
         if (episode % ((episodes-1)/10)) == 0 and episode != 0:
             torch.save(model, "model" + str(episode) + title + ".mdl")
         
-        if (episode % ((episodeLimit-1)/10)) == 0 and episode <= episodeLimit:
-            epsilon_aux -= 1
-            epsilon = epsilon_aux/10
-            print("At the episode", episode, "Epsilon is", epsilon)
+        #if (episode % ((episodeLimit-1)/10)) == 0 and episode <= episodeLimit:
+        #    epsilon_aux -= 1
+        #    epsilon = epsilon_aux/10
+        #    print("At the episode", episode, "Epsilon is", epsilon)
 
 # %%
 def main():
     args = sys.argv[1:]
-    model = DQN_replay(hidden_dim=int(args[3]))
-    q_learning_replay(model, episodes=int(args[0])+1, port=int(args[1]), title=args[2])
+    model = DQN_replay(hidden_dim=int(args[3]), lr=0.001, mom=0.9)
+    q_learning_replay(model, episodes=int(args[0])+1, replay_size=170, memory_size=100000, port=int(args[1]), title=args[2])
 
 if __name__ == "__main__":
     main()

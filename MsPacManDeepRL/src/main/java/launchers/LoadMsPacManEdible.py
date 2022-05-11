@@ -30,14 +30,13 @@ class Game():
             if lista[0] == "gameOver":
                 self.conn.send(bytes("GAMEOVER\n",'UTF-8'))
                 return None, reward, action
-            
-            state_list = lista[0].split("/")
-            
+                        
             list_dist_ghosts = list(map(int, lista[0].replace("[","").replace("]","").split(",")))
-            
-            print(data)
 
-            next_state = list_dist_ghosts
+            max_num = 500
+            min_num = 0
+
+            next_state = [(x - min_num)/(max_num - min_num) for x in list_dist_ghosts]
         
             
         except Exception as e:
@@ -121,10 +120,7 @@ def q_execute(model, port=38514):
     state, reward, _ = game.get_state()
     
     while True:
-        # Add state and reward to a file TODO delete this
-        #f = open("state_reward_file.txt" ,"a+")
-        #f.write(str(state) + ";" + str(reward) + "\n")
-        #f.close()
+        print("\rState: {} | Reward: {}".format(state, reward))
 
         # Implement greedy search policy to explore the state space 
         q_values = model.predict(state)

@@ -5,6 +5,8 @@ from torch.autograd import Variable
 import socket
 import sys
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 # %%
 class Game():
     def __init__(self, host="localhost", port=38514, num_episodes=100):
@@ -43,7 +45,7 @@ class Game():
 
             next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_time_ghosts
             
-            max_num = 250
+            max_num = 500
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
@@ -65,21 +67,21 @@ class Game():
 # %%
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=16, action_dim=4, hidden_dim=8, lr=0.0005, mom=0.9):
+    def __init__(self, state_dim=16, action_dim=4, hidden_dim=8, lr=0.0005):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
                         torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim,hidden_dim),
                         torch.nn.LeakyReLU(),
-                        torch.nn.Linear(hidden_dim, action_dim))
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=mom)
+                        torch.nn.Linear(hidden_dim, action_dim)).to(device)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr) #cambiar
         
     def update(self, state, y):
         """Update the weights of the network given a training sample. """
-        tensor = torch.Tensor(state)
-        y_pred = self.model(tensor)
-        loss = self.criterion(y_pred, Variable(torch.Tensor(y)))
+        tensor = torch.Tensor(state).to(device)
+        y_pred = self.model(tensor).to(device)
+        loss = self.criterion(y_pred, Variable(torch.Tensor(y).to(device)))
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
@@ -87,7 +89,7 @@ class DQN():
     def predict(self, state):
         """ Compute Q values for all actions using the DQL. """
         with torch.no_grad():
-            return self.model(torch.Tensor(state))
+            return self.model(torch.Tensor(state).to(device))
 
 # %%
 class DQN_replay(DQN):
@@ -105,11 +107,11 @@ class DQN_replay(DQN):
             rewards = batch_t[3]
             is_dones = batch_t[4]
         
-            states = torch.Tensor(states)
-            actions_tensor = torch.Tensor(actions)
-            next_states = torch.Tensor(next_states)
-            rewards = torch.Tensor(rewards)
-            is_dones_tensor = torch.Tensor(is_dones)
+            states = torch.Tensor(states).to(device)
+            actions_tensor = torch.Tensor(actions).to(device)
+            next_states = torch.Tensor(next_states).to(device)
+            rewards = torch.Tensor(rewards).to(device)
+            is_dones_tensor = torch.Tensor(is_dones).to(device)
         
             is_dones_indices = torch.where(is_dones_tensor==True)[0]
         
@@ -140,7 +142,9 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
             # Implement greedy search policy to explore the state space
             if random.random() < epsilon:
                 action1 = random.randint(0,3)
-                action2 = (action1+1) % 4
+                action2 = random.randint(0,3)
+                while action2 == action1:
+                    action2 = random.randint(0,3)
                 game.send_action(action1, action2)
             else:
                 q_values = model.predict(state)
@@ -175,8 +179,8 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
 # %%
 def main():
     args = sys.argv[1:]
-    model = DQN_replay(hidden_dim=int(args[3]), lr=0.001, mom=0.9)
-    q_learning_replay(model, episodes=int(args[0])+1, replay_size=170, memory_size=100000, port=int(args[1]), title=args[2])
+    model = DQN_replay(hidden_dim=int(args[3]))
+    q_learning_replay(model, episodes=int(args[0])+1, port=int(args[1]), title=args[2])
 
 if __name__ == "__main__":
     main()
