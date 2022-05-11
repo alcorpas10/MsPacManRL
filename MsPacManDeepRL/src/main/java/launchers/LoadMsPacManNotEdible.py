@@ -40,7 +40,7 @@ class Game():
 
             next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts
             
-            max_num = 500
+            max_num = 300
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]

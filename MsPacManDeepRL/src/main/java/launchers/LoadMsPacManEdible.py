@@ -33,7 +33,7 @@ class Game():
                         
             list_dist_ghosts = list(map(int, lista[0].replace("[","").replace("]","").split(",")))
 
-            max_num = 500
+            max_num = 300
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in list_dist_ghosts]

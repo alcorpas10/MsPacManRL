@@ -22,21 +22,21 @@ import utils.Pair;
 public class MsPacMan extends PacmanController implements Action {
 	private BufferedReader fromServer;
 	private PrintWriter toServer;
-	private Game game;
-	private static int maxValue = 500;
+	private static int maxValue = 300;
 	private String name;
 	private int type;
+	private Game game;
 	private MOVE lastMoveMade;
 	private int lastTime;
 	private int lastGhosts;
 	private int lastScore;
 	private GHOST lastNearestGhost;
+	private int lastDistanceToGhost;
 	private int lastDistance;
 	private int lastPills;
 	private int lastPPills;
 	private int lastLevel;
 	private int lastLives;
-	private int lastDistanceToGhost;
 
 	/**
 	 * @param type 0: General; 1: Not Edible; 2: Edible
@@ -84,9 +84,6 @@ public class MsPacMan extends PacmanController implements Action {
 		List<GHOST> lGhost = pairGhostDist.getFirst();
 		List<Integer> distGhosts = pairGhostDist.getSecond();
 		
-
-		
-		
 		String output = null;
 
 		// General state
@@ -99,7 +96,8 @@ public class MsPacMan extends PacmanController implements Action {
 				if (g == null) {
 					edibleTimeGhosts.add(0);
 				} else {
-					edibleTimeGhosts.add(game.getGhostEdibleTime(g));
+					int time = (game.getGhostEdibleTime(g) > 0) ? maxValue : 0;
+					edibleTimeGhosts.add(time);
 				}
 			}
 			output = distPills + "/" + distPowerPills + "/" + distGhosts + "/" + edibleTimeGhosts + ";";
@@ -115,6 +113,7 @@ public class MsPacMan extends PacmanController implements Action {
 		else {
 			List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 			List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
+			
 			output = distGhosts + ";";
 		}
 		toServer.print(output + calculateReward() + ";" + lastMoveMade.ordinal());

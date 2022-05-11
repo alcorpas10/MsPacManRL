@@ -38,16 +38,18 @@ class Game():
             list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
             list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
             list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))
-            list_edible_time_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
+            list_edible_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
 
-
-            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_time_ghosts
+            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_ghosts
             
-            max_num = 250
+            max_num = 300
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
             
+            if any(x > 1 for x in next_state):
+                raise Exception("Next state contains a number greater than 1")
+                
         except Exception as e:
             print(e)
             f = open("error_file.txt" ,"a+")
@@ -129,6 +131,9 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
     q_values = []
     memory = []
     episode_i = 0
+    #epsilon = 1
+    #epsilon_aux = 11
+    #episodeLimit = (episodes-1) * 5/8 + 1
     
     for episode in range(episodes):
         episode_i += 1
@@ -171,6 +176,11 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
         
         if (episode % ((episodes-1)/10)) == 0 and episode != 0:
             torch.save(model, "model" + str(episode) + title + ".mdl")
+        
+        #if (episode % ((episodeLimit-1)/10)) == 0 and episode <= episodeLimit:
+        #    epsilon_aux -= 1
+        #    epsilon = epsilon_aux/10
+        #    print("At the episode", episode, "Epsilon is", epsilon)
 
 # %%
 def main():

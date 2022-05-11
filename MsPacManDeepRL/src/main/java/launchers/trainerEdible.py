@@ -33,17 +33,17 @@ class Game():
                 self.conn.send(bytes("GAMEOVER\n",'UTF-8'))
                 return None, reward, action
                 
-            
             list_dist_ghosts = list(map(int, lista[0].replace("[","").replace("]","").split(",")))
             
             next_state = list_dist_ghosts
 
-            max_num = 250
+            max_num = 300
             min_num = 0
 
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
-                
-            #print(next_state, "Reward:", reward)
+            
+            if any(x > 1 for x in next_state):
+                raise Exception("Next state contains a number greater than 1")
             
         except Exception as e:
             print(e)
@@ -127,7 +127,6 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
     #epsilon = 1
     #epsilon_aux = 11
     #episodeLimit = (episodes-1) * 5/8 + 1
-
     
     for episode in range(episodes):
         episode_i += 1
