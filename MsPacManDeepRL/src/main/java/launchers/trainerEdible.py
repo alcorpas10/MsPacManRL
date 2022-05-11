@@ -124,6 +124,10 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
     q_values = []
     memory = []
     episode_i = 0
+    epsilon = 1
+    epsilon_aux = 11
+    episodeLimit = (episodes-1) * 5/8 + 1
+
     
     for episode in range(episodes):
         episode_i += 1
@@ -166,6 +170,11 @@ def q_learning_replay(model, episodes=100, port=38514, gamma=0.7, epsilon=0.2, r
         
         if (episode % ((episodes-1)/10)) == 0 and episode != 0:
             torch.save(model, "model" + str(episode) + title + ".mdl")
+        
+        if (episode % ((episodeLimit-1)/10)) == 0 and episode <= episodeLimit:
+            epsilon_aux -= 1
+            epsilon = epsilon_aux/10
+            print("At the episode", episode, "Epsilon is", epsilon)
 
 # %%
 def main():

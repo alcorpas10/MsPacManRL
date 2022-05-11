@@ -364,7 +364,7 @@ public class ExecutorDeepLearn {
 	 * @param delay            The delay between time-steps
 	 */
 	public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {
-		Game game = setupGame();
+		Game game = setupGameTrainEdible();
 
 		precompute(pacManController, ghostController);
 		pacManController.init(game);
