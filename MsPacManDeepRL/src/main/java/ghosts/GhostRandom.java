@@ -2,10 +2,10 @@ package ghosts;
 import java.util.EnumMap;
 import java.util.Random;
 
-import engine.pacman.controllers.GhostController;
-import engine.pacman.game.Constants.GHOST;
-import engine.pacman.game.Constants.MOVE;
-import engine.pacman.game.Game;
+import pacman.controllers.GhostController;
+import pacman.game.Constants.GHOST;
+import pacman.game.Constants.MOVE;
+import pacman.game.Game;
 
 public final class GhostRandom extends GhostController {
 	private EnumMap<GHOST, MOVE> moves = new EnumMap<GHOST, MOVE>(GHOST.class);

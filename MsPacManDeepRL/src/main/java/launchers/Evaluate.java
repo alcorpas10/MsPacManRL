@@ -1,7 +1,7 @@
 package launchers;
 
-import engine.es.ucm.fdi.ici.PacManEvaluatorTFG;
-import engine.es.ucm.fdi.ici.Scores;
+import es.ucm.fdi.ici.PacManEvaluatorTFG;
+import es.ucm.fdi.ici.Scores;
 
 public class Evaluate {
 

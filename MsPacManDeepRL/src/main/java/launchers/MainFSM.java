@@ -1,8 +1,8 @@
 package launchers;
 
-import engine.pacman.controllers.GhostController;
+import pacman.controllers.GhostController;
 import ghosts.GhostNormal;
-import pacman.ExecutorDeepLearn;
+import mspacman.ExecutorDeepLearn;
 
 public class MainFSM {
 	public static void main(String[] args) {

@@ -3,10 +3,10 @@ package launchers;
 import java.io.IOException;
 import java.net.Socket;
 
-import engine.pacman.controllers.GhostController;
+import pacman.controllers.GhostController;
 import ghosts.GhostNormal;
-import pacman.ExecutorDeepLearn;
-import pacman.MsPacMan;
+import mspacman.ExecutorDeepLearn;
+import mspacman.MsPacMan;
 
 public class MainTrain {
 	public static void main(String[] args) {

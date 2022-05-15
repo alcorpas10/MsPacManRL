@@ -2,11 +2,11 @@ package ghosts;
 
 import java.util.EnumMap;
 
-import engine.pacman.controllers.GhostController;
-import engine.pacman.game.Constants.DM;
-import engine.pacman.game.Constants.GHOST;
-import engine.pacman.game.Constants.MOVE;
-import engine.pacman.game.Game;
+import pacman.controllers.GhostController;
+import pacman.game.Constants.DM;
+import pacman.game.Constants.GHOST;
+import pacman.game.Constants.MOVE;
+import pacman.game.Game;
 
 public class GhostAlgorithmic extends GhostController {
 	// Distancia a la que se separan los fantasmas mientras persiguen a Pacman
