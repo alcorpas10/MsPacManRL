@@ -90,25 +90,23 @@ public class MsPacMan extends PacmanController implements Action {
 		if (type == 0) {
 			List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 			List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
-			//List<Integer> edibleTimeGhosts = new ArrayList<>();
-			int i = 0;
+			List<Integer> edibleGhosts = new ArrayList<>();
 			for (GHOST g : lGhost) {
-				if (g != null) {
-					if (game.getGhostEdibleTime(g) == 0)
-						distGhosts.set(i, (int) 0.5*distGhosts.get(i)+150);
-				}
-				i++;
+				if (g != null)
+					edibleGhosts.add((game.getGhostEdibleTime(g) > 0) ? maxValue/2 : 0);
+				else
+					edibleGhosts.add(maxValue);
 			}
-			output = distPills + "/" + distPowerPills + "/" + distGhosts + ";"; // + "/" + edibleTimeGhosts
+			output = distPills + "/" + distPowerPills + "/" + distGhosts + "/" + edibleGhosts + ";"; 
 		}
-		// Not Edible state
+		// Not Edible state and long Edible state
 		else if (type == 1 || type == 2) {
 			List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 			List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 
 			output = distPills + "/" + distPowerPills + "/" + distGhosts + ";";
 		}
-		// Edible state
+		// Short Edible state
 		else {
 			output = distGhosts + ";";
 		}
@@ -123,24 +121,31 @@ public class MsPacMan extends PacmanController implements Action {
 
 		int currentGhosts = game.getNumberOfGhostsEaten();
 		int currentLives = game.getPacmanNumberOfLivesRemaining();
-		//int currentLevel = game.getCurrentLevel();
 
 		// General reward
 		if (type == 0) {
 			int currentPills = game.getNumberOfActivePills();
-			int aux = (lastPills - currentPills) * 10;
+			int aux = (lastPills - currentPills) * 1;
 			int rewardForPills = (aux > 0) ? aux : 0;
 			lastPills = currentPills;
 
 			int currentPPills = game.getNumberOfActivePowerPills();
-			int aux2 = (lastPPills - currentPPills) * 50;
+			int aux2 = (lastPPills - currentPPills) * 5;
 			int rewardForPPills = (aux2 > 0) ? aux2 : 0;
 			lastPPills = currentPPills;
 			
-			int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
+			int rewardForGhosts = (currentGhosts - lastGhosts) * 250;
 			lastGhosts = currentGhosts;
 			
-			reward = rewardForPills + rewardForPPills + rewardForGhosts;
+			int currentLevel = game.getCurrentLevel();
+			int rewardForLevel = (currentLevel > lastLevel) ? 2000 : 0;
+			lastLevel = currentLevel;
+			
+			int currentTime = game.getTotalTime();
+			int rewardForTime = currentTime - lastTime;
+			lastTime = currentTime;
+			
+			reward = rewardForPills + rewardForPPills + rewardForGhosts + rewardForLevel + rewardForTime;
 		}
 		// Not Edible reward
 		else if (type == 1) {
@@ -152,33 +157,6 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		// Edible reward
 		else {
-			/*Pair<List<GHOST>, List<Integer>> pairGhostDist = getNearestGhosts(this.game.getPacmanCurrentNodeIndex());
-			List<Integer> distGhosts = pairGhostDist.getSecond();
-			
-			int distanceToGhost = maxValue;
-			for(int dist: distGhosts) {
-				if(dist < distanceToGhost)
-					distanceToGhost = dist;
-			}
-			
-			reward = (this.lastDistanceToGhost != maxValue && distanceToGhost != maxValue && currentGhosts == lastGhosts) ?
-					(this.lastDistanceToGhost - distanceToGhost) : 0;
-			this.lastDistanceToGhost = distanceToGhost;*/
-			
-			/*int node = game.getPacmanCurrentNodeIndex();
-			int currentDistance = (lastNearestGhost != null) ? 
-					(int) game.getDistance(node, game.getGhostCurrentNodeIndex(lastNearestGhost), DM.PATH)
-					: maxValue;
-			int rewardForCloser = (lastDistance != maxValue && currentDistance != maxValue) ?
-					(lastDistance - currentDistance) : 0;
-			
-			GHOST g = getNearestGhost(node);
-			lastDistance = (g != null) ? 
-					(int) game.getDistance(node, game.getGhostCurrentNodeIndex(g), DM.PATH)	: maxValue;
-			lastNearestGhost = g;
-
-			reward = rewardForPills + rewardForCloser;*/
-			
 			int currentPills = game.getNumberOfActivePills();
 			int aux = (lastPills - currentPills);
 			int rewardForPills = (aux > 0) ? aux : 0;
@@ -187,26 +165,13 @@ public class MsPacMan extends PacmanController implements Action {
 			int rewardForGhosts = (currentGhosts - lastGhosts) * 250;
 			lastGhosts = currentGhosts;
 			
-			reward = rewardForPills + rewardForGhosts;
-			//return rewardForGhosts;
+			reward = rewardForPills + rewardForGhosts; // For short state remove rewardForPills
 		}
-		
-		/*
-		int currentTime = game.getTotalTime();
-		
-		int rewardForTime = (lastTime - currentTime);
-		lastTime = currentTime;*/
-
-		/*int rewardForGhosts = (currentGhosts - lastGhosts) * Constants.GHOST_EAT_SCORE;
-		lastGhosts = currentGhosts;*/
 
 		int rewardForLives = (currentLives < lastLives) ? -500 : 0;
 		lastLives = currentLives;
 
-		/*int rewardForLevel = (currentLevel > lastLevel) ? 1000 : 0;
-		lastLevel = currentLevel;*/
-
-		return reward + rewardForLives; //+ rewardForGhosts + rewardForLevel + rewardForTime;
+		return reward + rewardForLives;
 	}
 
 	private MOVE recieveAction(int msPacManNode) {

@@ -72,8 +72,8 @@ class DQN():
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
                         torch.nn.LeakyReLU(),
-                        torch.nn.Linear(hidden_dim,hidden_dim),
-                        torch.nn.LeakyReLU(),
+                        #torch.nn.Linear(hidden_dim,hidden_dim),
+                        #torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=mom)
         

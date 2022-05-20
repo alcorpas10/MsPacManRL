@@ -36,9 +36,9 @@ class Game():
             list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
             list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
             list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))
-            list_edible_time_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
+            list_edible_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
 
-            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_time_ghosts
+            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_ghosts
             
             max_num = 300
             min_num = 0
@@ -67,8 +67,8 @@ class DQN():
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
                         torch.nn.LeakyReLU(),
-                        torch.nn.Linear(hidden_dim,hidden_dim),
-                        torch.nn.LeakyReLU(),
+                        #torch.nn.Linear(hidden_dim,hidden_dim),
+                        #torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=mom) #cambiar
         
