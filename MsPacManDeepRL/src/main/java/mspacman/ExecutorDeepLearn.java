@@ -322,10 +322,6 @@ public class ExecutorDeepLearn {
         for (int i = 0; i < trials; ) {
             try {
                 game = setupGame();
-                //PythonLauncher pl1 = new PythonLauncher("models/legendaryNotEdible.mdl"/*+description.split(" - ")[0]+"notEdible.mdl"*/, "38514");
-                //PythonLauncher pl2 = new PythonLauncher("models/insaneWithPillsEdible.mdl"/*+description.split(" - ")[0]+"edible.mdl"*/, "38515");
-                //pl1.start();
-                //pl2.start();
                 MsPacManFSM pacManController = new MsPacManFSM();
                 precompute(pacManController, ghostController);
                 pacManController.init(game);
@@ -356,6 +352,48 @@ public class ExecutorDeepLearn {
         
         return new Stats[]{stats, ticks};
     }
+	
+	public Stats[] runExperiment(MsPacMan pacManController, GhostController ghostController, int trials,
+			String description) {
+		Stats stats = new Stats(description);
+		Stats ticks = new Stats(description + " Ticks");
+		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
+		Game game;
+
+		Long startTime = System.currentTimeMillis();
+		for (int i = 0; i < trials;) {
+			try {
+				game = setupGame();
+				precompute(pacManController, ghostControllerCopy);
+				pacManController.init(game);
+				while (!game.gameOver()) {
+					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
+						break;
+					}
+					handlePeek(game);
+					game.advanceGame(
+							pacManController.getMove(getPacmanCopy(game), System.currentTimeMillis() + timeLimit),
+							ghostControllerCopy.getMove(getGhostsCopy(game), System.currentTimeMillis() + timeLimit));
+				}
+				stats.add(game.getScore());
+				ticks.add(game.getCurrentLevelTime());
+				i++;
+				postcompute(pacManController, ghostController);
+				pacManController.gameOver(getPacmanCopy(game));
+        		pacManController.getOk();
+				System.out.println("Game finished: " + i + "   " + description);
+			} catch (Exception e) {
+				System.err.println("ERROR runExperiment: " + pacManController.getClass().getCanonicalName() + " vs "
+						+ ghostControllerCopy.getClass().getCanonicalName());
+				e.printStackTrace();
+			}
+		}
+		long timeTaken = System.currentTimeMillis() - startTime;
+		stats.setMsTaken(timeTaken);
+		ticks.setMsTaken(timeTaken);
+
+		return new Stats[] { stats, ticks };
+	}
 	
 	/**
 	 * Run a game in asynchronous mode: the game waits until a move is returned. In

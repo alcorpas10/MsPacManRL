@@ -14,6 +14,7 @@ class Game():
             print('Bind failed. Error Code : ' .format(err))
         self.sock.listen(2)
 
+        
     def connect(self):
         self.conn, _ = self.sock.accept()
 
@@ -22,6 +23,7 @@ class Game():
 
     def get_state(self):
         data = self.conn.recv(512)
+
         data = data.decode(encoding='UTF-8')
 
         try:
@@ -37,9 +39,9 @@ class Game():
             list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
             list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
             list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))
-            list_edible_ghosts = list(map(int, state_list[3].replace("[","").replace("]","").split(",")))
+            
 
-            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts + list_edible_ghosts
+            next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts
             
             max_num = 300
             min_num = 0
@@ -53,7 +55,7 @@ class Game():
             f.write(str(self.error_num) + ": " + data + "\n")
             f.close()
             self.error_num += 1
-            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
+            next_state = [-38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514, -38514]
             reward = 0
             action = 0
         return next_state, reward, action
@@ -64,13 +66,13 @@ class Game():
 
 class DQN():
     ''' Deep Q Neural Network class. '''
-    def __init__(self, state_dim=12, action_dim=4, hidden_dim=8, lr=0.0005, mom=0.9):
+    def __init__(self, state_dim=12, action_dim=4, hidden_dim=8, lr=0.0005):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
                         torch.nn.Linear(state_dim, hidden_dim),
                         torch.nn.LeakyReLU(),
                         torch.nn.Linear(hidden_dim, action_dim))
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=mom)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr) #cambiar
         
     def update(self, state, y):
         """Update the weights of the network given a training sample. """
@@ -118,13 +120,13 @@ class DQN_replay(DQN):
             
             self.update(states.tolist(), all_q_values.tolist())
 
-def q_execute(model, num_ghosts=4, trials=250, port=38514):
+def q_execute(model, num_ghosts, trials, port):
     """Deep Q Learning algorithm using the DQN. """
     game = Game(port=port)
     for i in range(num_ghosts):
-        game.connect()
         for e in range(trials):
             # init
+            game.connect()
             q_values = []
             state, _, _ = game.get_state()
 
@@ -140,16 +142,17 @@ def q_execute(model, num_ghosts=4, trials=250, port=38514):
                     state, _ , _= game.get_state()
                     if state is None:
                         # game over
-                        break            
-
-        game.disconnect()
+                        break
+            
+            game.disconnect()
+            
 
     
 
 def main():
     args = sys.argv[1:]
     model = torch.load(args[0])
-    q_execute(model, port=int(args[1]))
+    q_execute(model, int(args[1]), int(args[2]), int(args[3]))
 
 if __name__ == "__main__":
     main()

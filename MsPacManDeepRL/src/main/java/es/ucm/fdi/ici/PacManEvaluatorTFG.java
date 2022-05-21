@@ -9,6 +9,7 @@ package es.ucm.fdi.ici;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -17,6 +18,7 @@ import pacman.controllers.GhostController;
 import pacman.controllers.PacmanController;
 import pacman.game.util.Stats;
 import mspacman.ExecutorDeepLearn;
+import mspacman.MsPacMan;
 
 
 public class PacManEvaluatorTFG {
@@ -95,28 +97,32 @@ public class PacManEvaluatorTFG {
 		String pacManTeams = properties.getProperty(KEY_MsPACMAN_TEAMS);
 		String ghostTeams = properties.getProperty(KEY_GHOSTS_TEAMS);
 		
-		for(String s: pacManTeams.split(","))
-		{
-			String className = s.trim();
-			try {
-				PacmanController pmc = (PacmanController)Class.forName(className).newInstance();
-				pmc.setName(className);
-				list_pacMan.add(pmc);
-			} catch (Exception e) {
-				System.err.println("Error loading MsPacMan class "+className);
-			} 
+		if (pacManTeams != null) {
+			for(String s: pacManTeams.split(","))
+			{
+				String className = s.trim();
+				try {
+					PacmanController pmc = (PacmanController)Class.forName(className).newInstance();
+					pmc.setName(className);
+					list_pacMan.add(pmc);
+				} catch (Exception e) {
+					System.err.println("Error loading MsPacMan class "+className);
+				} 
+			}
 		}
-
-		for(String s: ghostTeams.split(","))
-		{
-			String className = s.trim();
-			try {
-				GhostController gc = (GhostController)Class.forName(className).newInstance();
-				gc.setName(className);
-				list_ghosts.add(gc);
-			} catch (Exception e) {
-				System.err.println("Error loading Ghosts class "+className);
-			} 
+		
+		if (ghostTeams != null) {
+			for(String s: ghostTeams.split(","))
+			{
+				String className = s.trim();
+				try {
+					GhostController gc = (GhostController)Class.forName(className).newInstance();
+					gc.setName(className);
+					list_ghosts.add(gc);
+				} catch (Exception e) {
+					System.err.println("Error loading Ghosts class "+className);
+				} 
+			}
 		}
 	}
 	
@@ -130,10 +136,6 @@ public class PacManEvaluatorTFG {
 		for(Controller<?> c: list_ghosts)
 			names_ghosts.add(c.getName());
 		
-		//int maxTrain = 1000000;
-		//for(int numTrainings=maxTrain/10; numTrainings<=maxTrain; numTrainings+=(maxTrain/10)) {	
-			//names_pacMan.add("MsPacManDQN"+numTrainings);
-		//}
 		names_pacMan.add("MsPacManDQN");
 		scores = new Scores(names_pacMan,names_ghosts);
 	    int p = 0;
@@ -142,7 +144,7 @@ public class PacManEvaluatorTFG {
 	    	int g=0;
 	    	for(GhostController ghosts: list_ghosts)
 	    	{
-	            try {  
+	            try {
 		    		Stats[] result = executor.runExperiment(pacMan, ghosts, trials, pacMan.getClass().getName()+ " - " + ghosts.getClass().getName());
 		    		scores.put(pacMan.getName(),ghosts.getName(), result[0]);
 	        	}catch(Exception e) {
@@ -156,23 +158,20 @@ public class PacManEvaluatorTFG {
     	int g=0;
     	
     	String ghostType;
-    	//for(int numTrainings=maxTrain/10; numTrainings<=maxTrain; numTrainings+=(maxTrain/10)) {
-    		for(GhostController ghosts: list_ghosts) {
-                try {  
-                	ghostType = ghosts.getClass().getName();
-    	    		//Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManDQN"+numTrainings+" - " + ghostType, numTrainings, ghostType.replace("ghosts.Ghost", ""));
-    	    		Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManDQN - " + ghostType, ghostType.replace("ghosts.Ghost", ""));
-    	    		//scores.put("MsPacManDQN"+numTrainings, ghosts.getName(), result[0]);
-    	    		scores.put("MsPacManDQN", ghosts.getName(), result[0]);
-    	    		g++;
-            	}catch(Exception e) {
-            		System.err.println("Error executing pacman "+p+"  ghost: "+g);
-            		System.err.println(e);	
-            	}
-            }
-    	//}
-	    
-
+		for(GhostController ghosts: list_ghosts) {
+            try {
+            	ghostType = ghosts.getClass().getName();
+            	//For the evaluation of DeepFSM MsPacMan
+	    		//Stats[] result = executor.runFSMExperiment(ghosts, trials,"MsPacManDQN - " + ghostType, ghostType.replace("ghosts.Ghost", ""));
+            	Socket socket = new Socket("localhost", 38514);
+	    		Stats[] result = executor.runExperiment(new MsPacMan(socket, "MsPacManDQN", 0), ghosts, trials, "MsPacManDQN - " + ghostType);
+	    		scores.put("MsPacManDQN", ghosts.getName(), result[0]);
+	    		g++;
+        	} catch(Exception e) {
+        		System.err.println("Error executing pacman "+p+"  ghost: "+g);
+        		System.err.println(e);
+        	}
+        }
 	}
 	
 	public Scores evaluate()
