@@ -4,7 +4,9 @@ import socket
 import random
 import sys
 
+# class that interacts with the game in java
 class Game():
+    #Initializes the game by initializing the socket at the given port and connecting to the engine in Java
     def __init__(self, host="localhost", port=38514):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.error_num = 1
@@ -14,41 +16,43 @@ class Game():
             print('Bind failed. Error Code : ' .format(err))
         self.sock.listen(2)
 
-        
+    #Connects to the engine     
     def connect(self):
         self.conn, _ = self.sock.accept()
 
+    # Close the connection
     def disconnect(self):
         self.conn.close()
 
+    #Gets the state of the game from the engine
     def get_state(self):
-        data = self.conn.recv(512)
+        data = self.conn.recv(512)  # get the data from the engine using the socket
 
-        data = data.decode(encoding='UTF-8')
+        data = data.decode(encoding='UTF-8')   # decode the data
 
         try:
-            lista = data.split(";")
-            reward = int(lista[1])
-            action = int(lista[2])
-            if lista[0] == "gameOver":
+            lista = data.split(";")     # split the data
+            reward = int(lista[1])      # get the reward
+            action = int(lista[2])      # get the action
+            if lista[0] == "gameOver":  # if the game is over send a string of gameover
                 self.conn.send(bytes("GAMEOVER\n",'UTF-8'))
                 return None, reward, action
                 
-            state_list = lista[0].split("/")
+            state_list = lista[0].split("/")    # get the state of the game
             
-            list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))
-            list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))
-            list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))
+            list_dist_pills = list(map(int, state_list[0].replace("[","").replace("]","").split(",")))     # get the distances to the nearest pill in each direction
+            list_dist_power_pills = list(map(int, state_list[1].replace("[","").replace("]","").split(",")))    # get the distances to the nearest power pill in each direction
+            list_dist_ghosts = list(map(int, state_list[2].replace("[","").replace("]","").split(",")))     # get the distances to the  nearest ghost  in each direction
             
-
+            # concatenate the lists to make the next state
             next_state = list_dist_pills + list_dist_power_pills + list_dist_ghosts
             
             max_num = 300
             min_num = 0
-
+            #Normalize the state
             next_state = [(x - min_num)/(max_num - min_num) for x in next_state]
         
-            
+        # In case of the exception save the error and send the error_num to the engine      
         except Exception as e:
             print(e)
             f = open("error_file.txt" ,"a+")
@@ -60,12 +64,14 @@ class Game():
             action = 0
         return next_state, reward, action
     
+    #Sends the two best actions to the engine
     def send_action(self, action1, action2):
         self.conn.send(bytes(str(action1) + ";" + str(action2) + "\n",'UTF-8'))
 
-
+#Deep Q Neural Network class. 
 class DQN():
     ''' Deep Q Neural Network class. '''
+    #Initializes the DQN network by creating the model and the optimizer
     def __init__(self, state_dim=12, action_dim=4, hidden_dim=8, lr=0.0005):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
@@ -88,10 +94,11 @@ class DQN():
         with torch.no_grad():
             return self.model(torch.Tensor(state))
 
+#Deep Q Neural Network class with replay memory. 
 class DQN_replay(DQN):
     def replay(self, memory, size=32, gamma=0.9):
         """New replay function"""
-        #Try to improve replay speed
+        #Sample a random minibatch of size transitions from memory and updates the network
         if len(memory) >= size:
             batch = random.sample(memory,size)
             
@@ -102,7 +109,8 @@ class DQN_replay(DQN):
             next_states = batch_t[2]
             rewards = batch_t[3]
             is_dones = batch_t[4]
-        
+
+            # Compute the states,action,rewards, is_dones, next_states
             states = torch.Tensor(states)
             actions_tensor = torch.Tensor(actions)
             next_states = torch.Tensor(next_states)
@@ -117,18 +125,19 @@ class DQN_replay(DQN):
             all_q_values[range(len(all_q_values)),actions]=rewards+gamma*torch.max(all_q_values_next, axis=1).values
             all_q_values[is_dones_indices.tolist(), actions_tensor[is_dones].tolist()]=rewards[is_dones_indices.tolist()]
         
-            
+            #Update the network
             self.update(states.tolist(), all_q_values.tolist())
 
+# Executes the DQN model with the game engine
 def q_execute(model, num_ghosts, trials, port):
     """Deep Q Learning algorithm using the DQN. """
-    game = Game(port=port)
-    for i in range(num_ghosts):
-        for e in range(trials):
+    game = Game(port=port)             # Creates the game class with the given port
+    for i in range(num_ghosts):         #For the number of ghosts in the game
+        for e in range(trials):         #For the number of trials
             # init
-            game.connect()
+            game.connect()             #Connect to the game engine
             q_values = []
-            state, _, _ = game.get_state()
+            state, _, _ = game.get_state()  #Get the state of the game
 
             if state is not None:
                 # game loop
@@ -148,11 +157,11 @@ def q_execute(model, num_ghosts, trials, port):
             
 
     
-
+#Main that initiates the game and the DQN model
 def main():
-    args = sys.argv[1:]
-    model = torch.load(args[0])
-    q_execute(model, int(args[1]), int(args[2]), int(args[3]))
+    args = sys.argv[1:]      # get the arguments from the command line
+    model = torch.load(args[0])     # load the model with the first argument
+    q_execute(model, int(args[1]), int(args[2]), int(args[3]))      # execute the game with the second argument
 
 if __name__ == "__main__":
     main()
