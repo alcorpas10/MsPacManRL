@@ -2,6 +2,9 @@ package es.ucm.fdi.ici.fsm;
 
 import es.ucm.fdi.ici.Input;
 
+/**
+ * Transition made to chase the ghosts.
+ */
 public class ChaseTransition implements Transition {
 	String id;
 	

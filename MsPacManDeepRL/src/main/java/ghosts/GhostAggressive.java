@@ -9,6 +9,9 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 
+/**
+ *Ghosts whose behavior is always going to eat mspacman even if they are edible
+ */
 public class GhostAggressive extends GhostController {
 	private EnumMap<GHOST, MOVE> moves = new EnumMap<GHOST, MOVE>(GHOST.class);
 	

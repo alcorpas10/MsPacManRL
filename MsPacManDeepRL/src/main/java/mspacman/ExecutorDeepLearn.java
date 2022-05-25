@@ -149,7 +149,9 @@ public class ExecutorDeepLearn {
 			return this;
 		}
 	}
-
+	/**
+	 * Initialize the params.
+	 */
 	private ExecutorDeepLearn(boolean pacmanPO, boolean ghostPO, boolean ghostsMessage, Messenger messenger,
 			double scaleFactor, boolean setDaemon, boolean visuals, int tickLimit, int timeLimit, POType poType,
 			int sightLimit, Function<Game, String> peek, boolean pacmanPOvisual) {
@@ -261,19 +263,28 @@ public class ExecutorDeepLearn {
 
 		return new Stats[] { stats, ticks };
 	}
-
+		
+	/**
+	 * Initializes the normal game
+	 */
 	private Game setupGame() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, false, false);
 	}
-
+	/**
+	 * Initializes the game for training with the ghosts being not edible
+	 */
 	private Game setupGameTrainNotEdible() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, false);
 	}
-
+	/**
+	 * Initializes the game for training with the ghosts being  edible
+	 */
 	private Game setupGameTrainEdible() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true, true);
 	}
-
+	/**
+	 * Initializes the game for training with only pills in the game and no ghosts
+	 */
 	private Game setupPillsGame() {
 		return new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit, true, true);
 	}
@@ -311,7 +322,20 @@ public class ExecutorDeepLearn {
 
 		return new Stats[] { stats, ticks };
 	}
-
+	
+	/**
+	 * For running multiple FSM games without visuals. This is useful to get a good idea
+	 * of how well a controller plays against a chosen opponent: the random nature
+	 * of the game means that performance can vary from game to game. Running many
+	 * games and looking at the average score (and standard deviation/error) helps
+	 * to get a better idea of how well the controller is likely to do in the
+	 * competition.
+	 * @param ghostController Ghost given
+	 * @param trials The number of trials given
+	 * @param description 
+	 * @param ghostType 
+	 * @return stats of the results
+	 */
 	public Stats[] runFSMExperiment(GhostController ghostController, int trials, String description, String ghostType) {
         Stats stats = new Stats(description);
         Stats ticks = new Stats(description + " Ticks");
@@ -352,7 +376,20 @@ public class ExecutorDeepLearn {
         
         return new Stats[]{stats, ticks};
     }
-	
+	/**
+	 * For running multiple games without visuals. This is useful to get a good idea
+	 * of how well a controller plays against a chosen opponent: the random nature
+	 * of the game means that performance can vary from game to game. Running many
+	 * games and looking at the average score (and standard deviation/error) helps
+	 * to get a better idea of how well the controller is likely to do in the
+	 * competition.
+	 *	The difference in this class is that the pacManController is the MsPacMan that connects with python.
+	 * @param pacManController The MsPac-Man connected to python
+	 * @param ghostController  The Ghosts controller
+	 * @param trials           The number of trials to be executed
+	 * @param description      Description for the stats
+	 * @return Stats[] containing the scores in index 0 and the ticks in position 1
+	 */
 	public Stats[] runExperiment(MsPacMan pacManController, GhostController ghostController, int trials,
 			String description) {
 		Stats stats = new Stats(description);
@@ -406,10 +443,10 @@ public class ExecutorDeepLearn {
 	 * @param delay            The delay between time-steps
 	 */
 	public int runGame(MsPacMan pacManController, GhostController ghostController, int delay) {
-		Game game = setupGameTrainEdible();
+		Game game = setupGame();   //setup the normal game
 
 		precompute(pacManController, ghostController);
-		pacManController.init(game);
+		pacManController.init(game);  //initialize mspacman
 		GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
 
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
@@ -439,22 +476,29 @@ public class ExecutorDeepLearn {
 
 		return game.getScore();
 	}
-
+	
+	/**
+	 * Class that runs a number of episodes given from python to train the not edible model.
+	 * 
+	 * @param pacManController The MsPacMan
+	 * @param ghostController	The Ghosts
+	 * @param description	
+	 */
 	public Stats[] runEpisodesTrainNotEdible(MsPacMan pacManController, GhostController ghostController,
 			String description) {
 		Stats stats = new Stats(description);
 		Stats ticks = new Stats(description + " Ticks");
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 		Game game;
-		int episodes = pacManController.getEpisodes();
+		int episodes = pacManController.getEpisodes();   //We get the number of episodes from pyhton
 		System.out.println("Episodes: " + episodes);
 
 		Long startTime = System.currentTimeMillis();
 		for (int i = 0; i < episodes;) {
 			try {
-				game = setupGameTrainNotEdible();
+				game = setupGameTrainNotEdible();  //setup the game to train the not edible model
 				precompute(pacManController, ghostControllerCopy);
-				pacManController.init(game);
+				pacManController.init(game);  //initialize the pacman
 				while (!game.gameOver()) {
 					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
 						break;
@@ -483,22 +527,28 @@ public class ExecutorDeepLearn {
 
 		return new Stats[] { stats, ticks };
 	}
-
+	/**
+	 * Class that runs a number of episodes given from python to train the edible model.
+	 * 
+	 * @param pacManController The MsPacMan
+	 * @param ghostController	The Ghosts
+	 * @param description	
+	 */
 	public Stats[] runEpisodesTrainEdible(MsPacMan pacManController, GhostController ghostController,
 			String description) {
 		Stats stats = new Stats(description);
 		Stats ticks = new Stats(description + " Ticks");
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 		Game game;
-		int episodes = pacManController.getEpisodes();
+		int episodes = pacManController.getEpisodes();  //We get the number of episodes from pyhton
 		System.out.println("Episodes: " + episodes);
 
 		Long startTime = System.currentTimeMillis();
 		for (int i = 0; i < episodes;) {
 			try {
-				game = setupGameTrainEdible();
+				game = setupGameTrainEdible();  //setup the game for edible train
 				precompute(pacManController, ghostControllerCopy);
-				pacManController.init(game);
+				pacManController.init(game);  //initialize the mspacman
 				while (!game.gameOver()) {
 					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
 						break;
@@ -527,22 +577,28 @@ public class ExecutorDeepLearn {
 
 		return new Stats[] { stats, ticks };
 	}
-
+	/**
+	 * Class that runs a number of episodes given from python to train the general model.
+	 * 
+	 * @param pacManController The MsPacMan
+	 * @param ghostController	The Ghosts
+	 * @param description	
+	 */
 	public Stats[] runEpisodesTrain(MsPacMan pacManController, GhostController ghostController, String description) {
 		Stats stats = new Stats(description);
 		Stats ticks = new Stats(description + " Ticks");
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);
 		Game game;
-		int episodes = pacManController.getEpisodes();
+		int episodes = pacManController.getEpisodes();  //We get the number of episodes from pyhton
 		System.out.println("Episodes: " + episodes);
 
 		Long startTime = System.currentTimeMillis();
-		for (int i = 0; i < episodes;) {
+		for (int i = 0; i < episodes;) {  //We run the game the number of episodes given
 			try {
-				game = setupGame();
+				game = setupGame();  //setup the game for general train
 				precompute(pacManController, ghostControllerCopy);
-				pacManController.init(game);
-				while (!game.gameOver()) {
+				pacManController.init(game);  //we initialize the mspacman
+				while (!game.gameOver()) {   
 					if (tickLimit != -1 && tickLimit < game.getTotalTime()) {
 						break;
 					}
@@ -570,13 +626,21 @@ public class ExecutorDeepLearn {
 
 		return new Stats[] { stats, ticks };
 	}
-
+	/**
+	 * Run the FSM game in asynchronous mode: the game waits until a move is returned. In
+	 * order to slow thing down in case the controllers return very quickly, a time
+	 * limit can be used. If fasted gameplay is required, this delay should be put
+	 * as 0.
+	 * 
+	 * @param ghostController  The Ghosts controller
+	 * @param delay            The delay between time-steps
+	 */
 	public int runGameFSM(GhostController ghostController, int delay) {
-		Game game = setupGame();
-		MsPacManFSM pacManController = new MsPacManFSM();
+		Game game = setupGame();   //setup the general game
+		MsPacManFSM pacManController = new MsPacManFSM();  //We create the MsPacMan for the FSM
 
 		precompute(pacManController, ghostController);
-		pacManController.init(game);
+		pacManController.init(game);  //initialize mspacman
 		GameView gv = (visuals) ? setupGameView(pacManController, game) : null;
 
 		GhostController ghostControllerCopy = ghostController.copy(ghostPO);

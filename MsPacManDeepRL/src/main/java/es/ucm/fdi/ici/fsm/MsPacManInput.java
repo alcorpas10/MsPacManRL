@@ -6,6 +6,10 @@ import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
+/**
+ * Class that gives the input to the fsm with the information needed from the game
+ *
+ */
 public class MsPacManInput extends Input {
 
 	private boolean chase;
@@ -17,6 +21,7 @@ public class MsPacManInput extends Input {
 		chase = false;
 		flee = false;
 		
+		//Looks if the nearest ghost is edible or not
 		GHOST g = getNearestGhost(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
 		if(g==null) {
 			flee = true;
@@ -28,6 +33,7 @@ public class MsPacManInput extends Input {
 				flee = true;
 		}
 	}
+	//gets the nearest ghost from mspacman 
 	private GHOST getNearestGhost(int msPacManNode, MOVE msPacManMove) {
   		int d = Integer.MAX_VALUE;
   		GHOST ghost = null;

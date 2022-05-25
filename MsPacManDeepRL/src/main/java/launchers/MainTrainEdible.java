@@ -9,9 +9,9 @@ import mspacman.ExecutorDeepLearn;
 import mspacman.MsPacMan;
 
 /**
- * Class that trains the general model a number of episodes 
+ * Class that trains the edible model a number of episodes with the 
  */
-public class MainTrain {
+public class MainTrainEdible {
 	public static void main(String[] args) {
 		//Class that executes the game
 		ExecutorDeepLearn executor = new ExecutorDeepLearn.Builder()
@@ -26,7 +26,7 @@ public class MainTrain {
 			MsPacMan pacMan = new MsPacMan(socket, "", 0); //MsPacMan that receives its actions from the socket
 			GhostController ghosts = new GhostNormal();   //The ghosts that we want to play against
 
-			System.out.println(executor.runEpisodesTrain(pacMan, ghosts, "Deep Learn")); //Trains the model a number of episodes 
+			System.out.println(executor.runEpisodesTrainEdible(pacMan, ghosts, "Deep Learn")); //Trains the model a number of episodes 
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

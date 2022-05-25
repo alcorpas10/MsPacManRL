@@ -2,6 +2,9 @@ package es.ucm.fdi.ici.fsm;
 
 import es.ucm.fdi.ici.Input;
 
+/**
+ * Transiton to flee from the ghosts.
+ */
 public class FleeTransition implements Transition {
 	String id;
 	

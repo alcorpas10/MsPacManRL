@@ -51,7 +51,10 @@ public class MsPacMan extends PacmanController implements Action {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * Initializes the msPacMan
+	 */
 	public void init(Game game) {
 		this.game = game;
 		this.lastMoveMade = MOVE.UP;
@@ -66,7 +69,9 @@ public class MsPacMan extends PacmanController implements Action {
 		this.lastLevel = game.getCurrentLevel();
 		this.lastLives = game.getPacmanNumberOfLivesRemaining();
 	}
-
+	/**
+	 * Sends the state to python and gets the move that has to be made
+	 */
 	@Override
 	public MOVE getMove(Game game, long timeDue) {
 		int msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -77,7 +82,9 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		return MOVE.NEUTRAL;
 	}
-
+	/**
+	 * Sends the corresponding state to python.
+	 */
 	// Unified method for every type of state
 	private void sendState(int msPacManNode) {
 		Pair<List<GHOST>, List<Integer>> pairGhostDist = getNearestGhosts(msPacManNode);
@@ -113,7 +120,10 @@ public class MsPacMan extends PacmanController implements Action {
 		toServer.print(output + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 	}
-
+	
+	/**
+	 * Calculates the corresponding reward that has to be sent to python.
+	 */
 	// Unified method for every type of reward
 	private int calculateReward() {
 		
@@ -173,7 +183,11 @@ public class MsPacMan extends PacmanController implements Action {
 
 		return reward + rewardForLives;
 	}
+	
+	/**
+	 * Receives from the python server the two best actions and does the action that is possible to be made.
 
+	 */
 	private MOVE recieveAction(int msPacManNode) {
 		try {
 			String data = fromServer.readLine();
@@ -195,7 +209,10 @@ public class MsPacMan extends PacmanController implements Action {
 			return MOVE.NEUTRAL;
 		}
 	}
-
+	
+	/**
+	 * Method that gets the nearest pill in every direction of the mspacman
+	 */
 	private List<Integer> getDistanceToNearestPills(int msPacManNode) {
 
 		List<Integer> l = Arrays.asList(new Integer[] { maxValue, maxValue, maxValue, maxValue });
@@ -207,7 +224,9 @@ public class MsPacMan extends PacmanController implements Action {
 		return l;
 
 	}
-
+	/**
+	 * Method that gets the nearest pill in the direction given from mspacman
+	 */
 	private int getDistanceToNearestPill(MOVE move, int msPacManNode) {
 		int[] pillsArray = game.getActivePillsIndices();
 		int distance, minDistance = maxValue, neigh = game.getNeighbour(msPacManNode, move);
@@ -218,7 +237,9 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		return minDistance;
 	}
-
+	/**
+	 * Method that gets the nearest powerpill in every direction of the mspacman
+	 */
 	private List<Integer> getDistanceToNearestPowerPills(int msPacManNode) {
 
 		List<Integer> l = Arrays.asList(new Integer[] { maxValue, maxValue, maxValue, maxValue });
@@ -230,7 +251,9 @@ public class MsPacMan extends PacmanController implements Action {
 		return l;
 
 	}
-
+	/**
+	 * Method that gets the nearest power pill in the direction given from mspacman
+	 */
 	private int getDistanceToNearestPowerPill(MOVE move, int msPacManNode) {
 		int[] powerPillsArray = game.getActivePowerPillsIndices();
 		int distance, minDistance = maxValue, neigh = game.getNeighbour(msPacManNode, move);
@@ -242,7 +265,9 @@ public class MsPacMan extends PacmanController implements Action {
 		}
 		return minDistance;
 	}
-
+	/**
+	 * Method that gets the nearest ghost in every direction of the mspacman
+	 */
 	private Pair<List<GHOST>, List<Integer>> getNearestGhosts(int msPacManNode) {
 
 		List<GHOST> lGhost = Arrays.asList(new GHOST[] { null, null, null, null });
@@ -257,7 +282,9 @@ public class MsPacMan extends PacmanController implements Action {
 		return new Pair<List<GHOST>, List<Integer>>(lGhost, lDistance);
 
 	}
-
+	/**
+	 * Method that gets the nearest ghost in the direction given from mspacman
+	 */
 	private Pair<GHOST, Integer> getNearestGhost(MOVE move, int msPacManNode) {
 		int distance, minDistance = maxValue, pos, neigh = game.getNeighbour(msPacManNode, move);
 		GHOST nearestGhost = null;
@@ -279,7 +306,9 @@ public class MsPacMan extends PacmanController implements Action {
 		return new Pair<GHOST, Integer>(nearestGhost, minDistance);
 	}
 	
-
+	/**
+	 * Method that gets the nearest ghost from mspacman
+	 */
 	private GHOST getNearestGhost(int msPacManNode) {
 		int distance, minDistance = Integer.MAX_VALUE, pos;
 		GHOST nearestGhost = null;
@@ -305,14 +334,20 @@ public class MsPacMan extends PacmanController implements Action {
 			return 0;
 		}
 	}
-
+	/**
+	 * Sends to python that the game is over, the last reward and the last move made.
+	 * @param game
+	 */
 	public void gameOver(Game game) {
 		this.game = game;
 		toServer.print("gameOver;" + calculateReward() + ";" + lastMoveMade.ordinal());
 		toServer.flush();
 		this.lastPills = 0;
 	}
-
+	
+	/**
+	 * Waits for the ok from the python server
+	 */
 	public void getOk() {
 		try {
 			fromServer.readLine(); // Waits OK
@@ -325,7 +360,10 @@ public class MsPacMan extends PacmanController implements Action {
 	public String getActionId() {
 		return this.name;
 	}
-
+	
+	/**
+	 * Method that executes the game in fsm
+	 */
 	@Override
 	public MOVE execute(Game game) {
 		int msPacManNode = game.getPacmanCurrentNodeIndex();
