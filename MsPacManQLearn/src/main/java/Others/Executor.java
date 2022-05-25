@@ -153,6 +153,9 @@ public class Executor {
 		}
     }
 
+    /**
+	 * Initialize the params.
+	 */
     private Executor(
             boolean pacmanPO,
             boolean ghostPO,
@@ -283,6 +286,9 @@ public class Executor {
         return new Stats[]{stats, ticks};
     }
 
+    /**
+	 * Initializes the normal game
+	 */
     private Game setupGame() {
         return (this.ghostsMessage) ? new Game(rnd.nextLong(), 0, messenger.copy(), poType, sightLimit) : new Game(rnd.nextLong(), 0, null, poType, sightLimit);
     }
@@ -621,7 +627,14 @@ public class Executor {
 
     
     
-    
+    /**
+     * Run a number of games game to train the model in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavior of mspacman.
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameQtrain(GhostController ghostController, int partidas) {
         Game game = setupGame();
         MOVE actMove;
@@ -651,7 +664,14 @@ public class Executor {
         }
         return learner;   
     }
-    
+    /**
+     * Run a number of games to train the random model in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavior of mspacman.
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameQtrainRandom(GhostController ghostController, int partidas) {
         Game game = setupRandomGame();
         MOVE actMove;
@@ -683,7 +703,14 @@ public class Executor {
         }
         return learner;   
     }
-    
+    /**
+     * Run a number of games to train the pills model in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanPills and the Qlearner to implement the behavior of mspacman.
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameQtrainPills(GhostController ghostController, int partidas) {
         Game game = setupPillsGame();
         MOVE actMove;
@@ -715,7 +742,14 @@ public class Executor {
         }
         return learner;   
     }
-    
+    /**
+     * Run a number of games to train the flee model in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanFlee and the Qlearner to implement the behavior of mspacman.
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameQtrainFlee(GhostController ghostController, int partidas) {
         Game game = setupFleeGame();
         MOVE actMove;
@@ -747,7 +781,14 @@ public class Executor {
         }
         return learner;   
     }
-    
+    /**
+     * Run a number of games to train the chase model in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanChase and the Qlearner to implement the behavior of mspacman.
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameQtrainChase(GhostController ghostController, int partidas) {
         Game game = setupChaseGame();
         MOVE actMove;
@@ -779,7 +820,14 @@ public class Executor {
         }
         return learner;   
     }
-    
+    /**
+     * Run a number of games to train the original model in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavior of mspacman.
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameQtrainOriginal(GhostController ghostController, int partidas) {
         Game game = setupRandomGame();
         MOVE actMove;
@@ -811,7 +859,15 @@ public class Executor {
         }
         return learner;   
     }
-    
+    /**
+     * Load a trained original model and run a number of games to train more the  model  in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavior of mspacman.
+     * @param model 		QPacMan trained model
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     
     public QLearner runGameLoadQtrain(String model, GhostController ghostController, int partidas) {
         Game game = setupGame();
@@ -843,6 +899,15 @@ public class Executor {
         return learner;   
     }
     
+    /**
+     * Load a random model and run a number of games to train more the  model : the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavior of mspacman.
+     * @param model 		QPacMan trained model
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of games.
+     */
     public QLearner runGameLoadQtrainRandom(String model, GhostController ghostController, int partidas) {
         Game game = setupRandomGame();
         MOVE actMove;
@@ -873,7 +938,16 @@ public class Executor {
         return learner;   
     }
     
-    public QLearner runGameLoadQtrainAlex(String model, GhostController ghostController, int partidas) {
+    /**
+     * Load a pills model and run a number of games to train more the  model: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanPills and the Qlearner to implement the behavoir of mspacman.
+     * @param model 		QPacMan trained model
+     * @param ghostController  The Ghosts controller
+     * @param partidas         Number of matches.
+     */
+    public QLearner runGameLoadQtrainPills(String model, GhostController ghostController, int partidas) {
         Game game = setupRandomGame();
         MOVE actMove;
         QLearner learner = QLearner.fromJson(model);
@@ -915,7 +989,15 @@ public class Executor {
     }*/
     
    
-    
+    /**
+     * Run a game of a trained original model given: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavoir of mspacman.
+     * @param model 		QPacMan trained model
+     * @param ghostController  The Ghosts controller
+     * @param delay            The delay between time-steps
+     */
     public int runGameQ(QLearner model, GhostController ghostController, int delay) {
         Game game = setupRandomGame();
         
@@ -951,6 +1033,15 @@ public class Executor {
         return game.getScore();
     }
     
+    /**
+     * Run a game of a random trained model given in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *	Uses the QPacmanOriginal and the Qlearner to implement the behavoir of mspacman.
+     * @param model 		QPacMan trained model
+     * @param ghostController  The Ghosts controller
+     * @param delay            The delay between time-steps
+     */
     public int runRandomQGame(QLearner model, GhostController ghostController, int delay) {
         Game game = setupRandomGame();
         
@@ -986,6 +1077,14 @@ public class Executor {
         return game.getScore();
     }
     
+    /**
+     * Run a FSM game in asynchronous mode: the game waits until a move is returned. In order to slow thing down in case
+     * the controllers return very quickly, a time limit can be used. If fasted gameplay is required, this delay
+     * should be put as 0.
+     *
+     * @param ghostController  The Ghosts controller
+     * @param delay            The delay between time-steps
+     */
     public int runGameFSM(GhostController ghostController, int delay) {
         Game game = setupGame();
         MsPacMan pacManController = new MsPacMan(game, 0, "");
@@ -1020,7 +1119,20 @@ public class Executor {
         
         return game.getScore();
     }
-    
+    /**
+     *
+     * @param ghostController  The Ghosts controller
+     * @param trials            The number of experiments
+     * 
+     */
+    /**
+     *  Run a number of FSM games and get the results in stats[]
+     * @param ghostController  The Ghosts controller
+     * @param trials   Number of experiments 
+     * @param description  Description of the experiment
+     * @param numTrainings    Number of trainings that the model has
+     * @param ghostType  Type of the ghost
+     */
     public Stats[] runFSMExperiment(GhostController ghostController, int trials, String description,int numTrainings, String ghostType) {
         Stats stats = new Stats(description);
         Stats ticks = new Stats(description + " Ticks");
@@ -1059,18 +1171,30 @@ public class Executor {
         return new Stats[]{stats, ticks};
     }
 
+    /**
+     * Method that sets a new random game
+     */
 	private Game setupRandomGame() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, false);
 	}
 	
+	/**
+     * Method that sets a new  game with only pills
+     */
 	private Game setupPillsGame() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true);
 	}
 	
+	/**
+     * Method that sets a new  game where the ghosts are edible
+     */
 	private Game setupChaseGame() {
 		return new Game(rnd.nextLong(), 0, poType, sightLimit, true);
 	}
 	
+	/**
+     * Method that sets a new  game where the ghosts are not edible
+     */
 	private Game setupFleeGame() {
 		return new Game(rnd.nextLong(), 0, null, poType, sightLimit, true,true);
 	}

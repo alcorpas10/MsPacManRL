@@ -7,13 +7,16 @@ import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-
+/**
+ * Ghosts whose behavior is algorithmic.
+ *
+ */
 public class GhostAlgorithmic extends GhostController {
-	// Distancia a la que se separan los fantasmas mientras persiguen a Pacman
+	// Distance the ghosts spread out while chasing Pacman
 	public final int CHASE_PROXIM_LIMIT = 30; 
-	// Distancia a la que se separan los fantasmas mientras huyen de Pacman
+	// Distance the ghosts are separated while fleeing from Pacman
 	public final int FLEE_PROXIM_LIMIT = 30;
-	// Distancia entre Pacman y una Power Pill a la que huyen los fantasmas
+	// Distance between Pacman and a Power Pill that ghosts flee to
 	public final int PPILL_FLEE_DIST = 25;
 	private EnumMap<GHOST, MOVE> moves = new EnumMap<GHOST, MOVE>(GHOST.class);
 	private GHOST other = null;
@@ -26,11 +29,11 @@ public class GhostAlgorithmic extends GhostController {
 		for (GHOST ghost : GHOST.values()) {
 			if (game.doesGhostRequireAction(ghost)) {
 				if(game.isGhostEdible(ghost) || pacManCloseToPPill(game, PPILL_FLEE_DIST, msPacManNode)) {
-					// HUIDA DE PACMAN
+					// FLEE FROM MSPACMAN
 					moves.put(ghost, getGhostFleeMove(game, ghost, msPacManNode));
 					
 				} else {
-					// PERSEGUIR A PACMAN
+					// CHASE MSPACMAN
 					moves.put(ghost, getGhostChaseMove(game, ghost, msPacManNode));
 				}
 			}
@@ -38,13 +41,13 @@ public class GhostAlgorithmic extends GhostController {
 		return moves;
 	}
 
-	// Devuelve el movimiento a realizar por ghost para huir de MsPacman
+	// Returns the movement to be made by ghost to flee from MsPacman
 	private MOVE getGhostFleeMove(Game game, GHOST ghost, int msPacManNode) {
 		MOVE move;
 		other = isNearOtherGhost(game, FLEE_PROXIM_LIMIT, ghost);
 
-		// Si hay un fantasma cercano, evita huir por el mismo camino
-		// Si no, huye de pacman
+		// If there is a ghost nearby, avoid running the same way
+		// If not, flee from mspacman
 		if (other != null)
 			move = game.getApproximateNextMoveAwayFromTarget(game.getGhostCurrentNodeIndex(ghost),
 					game.getGhostCurrentNodeIndex(other), game.getGhostLastMoveMade(ghost), DM.EUCLID);
@@ -55,7 +58,7 @@ public class GhostAlgorithmic extends GhostController {
 		return move;
 	}
 	
-	// Devuelve el movimiento a realizar por ghost para huir de MsPacman
+	// Returns the movement to be made by ghost to flee from MsPacman
 	private MOVE getGhostChaseMove(Game game, GHOST ghost, int msPacManNode) {
 		MOVE move = null;
 		other = isNearOtherGhost(game, CHASE_PROXIM_LIMIT, ghost);
@@ -65,7 +68,7 @@ public class GhostAlgorithmic extends GhostController {
 			move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
 					ppillCloserToGhost, game.getGhostLastMoveMade(ghost), DM.EUCLID);
 		} else if(other != null) {
-			// Si hay otro fantasma cercano, persigue a Pacman con prediccion (getAmbushPosition)
+			// If there is another ghost nearby, chase mspacman with prediction (getAmbushPosition)
 			MOVE dir = game.getPacmanLastMoveMade();
 			int pos = msPacManNode;
 
@@ -73,7 +76,7 @@ public class GhostAlgorithmic extends GhostController {
 			move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
 					pos, game.getGhostLastMoveMade(ghost), DM.EUCLID);
 		} else {
-			// Persigue a Pacman yendo detras de el
+			// Chase MsPacman by going after her
 			move = game.getApproximateNextMoveTowardsTarget(game.getGhostCurrentNodeIndex(ghost),
 					msPacManNode, game.getGhostLastMoveMade(ghost), DM.EUCLID);
 		}
@@ -81,7 +84,7 @@ public class GhostAlgorithmic extends GhostController {
 		return move;
 	}
 	
-	// Si el fantasma se encuentra mas cercano a una powerpill que Pacman, devuelve el nodo en el que se encuentra dicha ppill
+	// If the ghost is closer to a powerpill than Pacman, it returns the node that powerpill is on
 	private int ghostCloserToPPill(Game game, int limit, int msPacManNode, GHOST ghost) {
 		if(game.isGhostEdible(ghost)) return -1;
 		
@@ -106,7 +109,7 @@ public class GhostAlgorithmic extends GhostController {
 		return false;
 	}
 
-	// Si ghost esta cerca de otro fantasma (dentro de limit), devuelve el otro fantasma
+	// If ghost is close to another ghost (within limit), return the other ghost
 	private GHOST isNearOtherGhost(Game game, int limit, GHOST ghost) {
 		for (GHOST ghostType : GHOST.values())
 			if (ghost != ghostType && game.getDistance(game.getGhostCurrentNodeIndex(ghost),
@@ -115,7 +118,7 @@ public class GhostAlgorithmic extends GhostController {
 		return null;
 	}
 
-	// Devuelve la siguiente interseccion desde pos en la direccion dir
+	// Returns the next intersection from pos at direction dir
 	private int getAmbushPosition(Game game, MOVE dir, int pos) {
 		int aux = game.getNeighbour(pos, dir);
 		while (aux != -1 && !game.isJunction(pos)) {

@@ -13,6 +13,10 @@ import pacman.game.Constants.DM;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
+/**
+ * Class that implements an algorithmic behaviour of mspacman 
+ */
+
 public class QPacManOriginal extends QPacMan{
     private Game game;
     private QLearner agent;
@@ -27,15 +31,22 @@ public class QPacManOriginal extends QPacMan{
 		this.agent = learner;
     }
     
+    /**
+     * method that sets new game
+     */
     public void setNewGame(Game game) {
     	this.game = game;
     	this.lastJunctionMove = MOVE.LEFT;
     	
+    	// MsPacMan info
     	int msPacManNode = game.getPacmanCurrentNodeIndex();
 		MOVE msPacManMove = game.getPacmanLastMoveMade();
   		
+		// Pills info
 		int pillNode = getNearestPill(msPacManNode, msPacManMove);
 		int distancePill = game.getShortestPathDistance(msPacManNode, pillNode);
+		
+		//Ghosts info
 		GHOST ghost = getNearestGhost(msPacManNode, msPacManMove);
 		boolean edible = false;
 		int distanceGhost = 4;
@@ -56,6 +67,7 @@ public class QPacManOriginal extends QPacMan{
 				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
 			}
 			
+			//discretize distance to ghosts
 			if(distanceGhost <= 20 )
 				distanceGhost = 0;
 			else if(distanceGhost <= 50)
@@ -66,6 +78,7 @@ public class QPacManOriginal extends QPacMan{
 				distanceGhost = 3;
 		}
 		
+		//discretize distance to pills
 		if(distancePill <= 20 && distancePill >= 0)
 			distancePill = 0;
 		else if(distancePill <= 50)
@@ -75,11 +88,14 @@ public class QPacManOriginal extends QPacMan{
 		else
 			distancePill = 3;
 		
-		
+		// Next state is updated
     	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
 
     }
 
+    /**
+     * Method that gets the next move from mspacman in a normal game
+     */
     public MOVE act() {
     	if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
      
@@ -114,7 +130,9 @@ public class QPacManOriginal extends QPacMan{
     	return MOVE.NEUTRAL;
 		
     }
-    
+    /**
+     * Method that calculate the state using the distance to the nearest ghost, nearest pill, if its edible or not, the direction of the nearest ghost and the direction of the nearest pill
+     */
     private void calculateState(int distanceGhost, int distancePill, boolean edible, MOVE directionGhost, MOVE directionPill) {
 		
     	int edibleInt =(edible)? 1:0;
@@ -123,7 +141,7 @@ public class QPacManOriginal extends QPacMan{
     }
     
     /**
-     * Basic strategy 
+     * Method that updates the strategy using the rewards that are needed in each case
      */
     public void updateStrategy() {
     	int msPacManNode = -1;
@@ -142,7 +160,7 @@ public class QPacManOriginal extends QPacMan{
         			break;
         		}
         	}
-        	
+        	//reward
         	if (game.wasPacManEaten())
         		reward = REWARD[2];
         	else if (eatenGhost)
@@ -152,11 +170,15 @@ public class QPacManOriginal extends QPacMan{
         	else
         		reward = REWARD[1];
         	
+        	//mspacman info
         	msPacManNode = game.getPacmanCurrentNodeIndex();
     		msPacManMove = game.getPacmanLastMoveMade();
       		
+    		//pills info
     		pillNode = getNearestPill(msPacManNode, msPacManMove);
     		distancePill = game.getShortestPathDistance(msPacManNode, pillNode);
+    		
+    		//ghost info
     		ghost = getNearestGhost(msPacManNode, msPacManMove);
     		boolean edible = false;
     		MOVE directionGhost = MOVE.UP, directionPill = game.getNextMoveTowardsTarget(msPacManNode, pillNode, msPacManMove, DM.PATH);;
@@ -176,6 +198,7 @@ public class QPacManOriginal extends QPacMan{
     				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
     			}
     			
+    			//discretize distance to ghosts
     			if(distanceGhost <= 20 )
     				distanceGhost = 0;
     			else if(distanceGhost <= 50)
@@ -186,6 +209,7 @@ public class QPacManOriginal extends QPacMan{
     				distanceGhost = 3;
     		}
     		
+    		//discretize distance to pill
     		if(distancePill <= 20 && distancePill >= 0)
     			distancePill = 0;
     		else if(distancePill <= 50)
@@ -195,6 +219,7 @@ public class QPacManOriginal extends QPacMan{
     		else
     			distancePill = 3;
     		
+    		//Attributes are updated
     		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
     			this.lastJunctionState = this.nextState;
     		
@@ -214,7 +239,9 @@ public class QPacManOriginal extends QPacMan{
     	}
     }
     
-    //Buscar los ghost no comestibles problematicos
+    /**
+     * @return The nearest ghost to MsPacMan taking into account last MsPacMan move
+     */
   	private GHOST getNearestGhost(int msPacManNode, MOVE msPacManMove) {
   		int d = Integer.MAX_VALUE;
   		GHOST ghost = null;
@@ -233,8 +260,9 @@ public class QPacManOriginal extends QPacMan{
   		return ghost;
   	}
   	
-  	//Metodo que obtiene la pill mas cercana y en caso de haber varias a la misma distancia obtiene la direccion a una
-  	//de ellas de forma pseudoaleatoria
+  	/**
+     * @return The nearest pill to MsPacMan taking into account last MsPacMan move
+     */
   	private int getNearestPill(int msPacManNode, MOVE msPacManMove) {
   		int[] pillsArray = game.getActivePillsIndices();
   		List<Integer> nearestPills = new ArrayList<Integer>();
@@ -263,6 +291,9 @@ public class QPacManOriginal extends QPacMan{
 		return "Original Action";
 	}
 
+	/**
+	 * Method that gets the next move in the FSM
+	 */
 	@Override
 	public MOVE execute(Game game) {
 		// TODO Auto-generated method stub

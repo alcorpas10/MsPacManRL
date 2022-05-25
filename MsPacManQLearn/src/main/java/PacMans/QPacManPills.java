@@ -11,6 +11,10 @@ import pacman.game.Game;
 import pacman.game.Constants.DM;
 import pacman.game.Constants.MOVE;
 
+/**
+ * Class that implements the  behaviour of mspacman with only pills in the maze
+ */
+
 public class QPacManPills extends QPacMan {
     private Game game;
     private QLearner agent;
@@ -30,6 +34,9 @@ public class QPacManPills extends QPacMan {
     	this.agent = learner;
     }
     
+    /**
+     * method that sets new game
+     */
     public void setNewGame(Game game) {
 		this.game = game;
 
@@ -49,12 +56,14 @@ public class QPacManPills extends QPacMan {
 		// Next state is updated
     	calculateState(pillsNumber, directionPill, distancePill);
 
-		// Initialization of class attributes
+		
     	this.lastJunctionMove = msPacManMove;
 		this.lastPillDistance = distancePill;
     	this.lastJunctionState = this.nextState;
     }
-
+    /**
+     * Method that gets the next move from mspacman in a normal game
+     */
     public MOVE act() {
     	int msPacManNode = game.getPacmanCurrentNodeIndex();
     	
@@ -92,10 +101,16 @@ public class QPacManPills extends QPacMan {
     	return MOVE.NEUTRAL;
     }
     
+    /**
+     * Method that calculate the state using the distance to the nearest ghost and the direction
+     */
     private void calculateState(int pillsNumber, MOVE directionPill, int distancePill) {    	
     	this.nextState = directionPill.ordinal()*10 + distancePill;
     }
     
+    /**
+     * Method that discretize the number of active pills 
+     */
     private int discretizePillsNumber(int number) {
     	if(number <= 10)
 			return 0;
@@ -108,7 +123,9 @@ public class QPacManPills extends QPacMan {
 		else
 			return 4;
     }
-    
+    /**
+     * Method that discretize the distance to a pill
+     */
     private int discretizePillDistance(int distance) {
 		if(distance <= 15)
 			return 0;
@@ -121,7 +138,7 @@ public class QPacManPills extends QPacMan {
     }
     
     /**
-     * Basic strategy 
+     * Method that updates the strategy using the rewards that are needed in each case
      */
     public void updateStrategy() {
     	int msPacManNode = -1;
@@ -206,6 +223,9 @@ public class QPacManPills extends QPacMan {
 		return "Pills Action";
 	}
 
+	/**
+	 * Method that gets the next move in the FSM
+	 */
 	@Override
 	public MOVE execute(Game game) {
 		int msPacManNode = game.getPacmanCurrentNodeIndex();

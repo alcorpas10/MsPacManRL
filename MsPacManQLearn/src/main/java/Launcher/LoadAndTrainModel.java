@@ -31,7 +31,7 @@ public class LoadAndTrainModel {
         }
 		
 		GhostController ghosts = new GhostRandom();
-		QLearner model = executor.runGameLoadQtrainAlex(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
+		QLearner model = executor.runGameLoadQtrainPills(contentBuilder.toString(), ghosts, Integer.parseInt(args[1]));
 		
 		try(PrintStream ps = new PrintStream(args[0])){
             ps.println(model.toJson());
