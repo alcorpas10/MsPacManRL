@@ -33,7 +33,11 @@ public class MsPacManInput extends Input {
 				flee = true;
 		}
 	}
-	//gets the nearest ghost from mspacman 
+	/**
+	 * gets the nearest ghost from mspacman 
+	 * @param msPacManNode node that mspacman is in the maze
+	 * @param msPacManMove  last move made by mspacman
+	 */
 	private GHOST getNearestGhost(int msPacManNode, MOVE msPacManMove) {
   		int d = Integer.MAX_VALUE;
   		GHOST ghost = null;

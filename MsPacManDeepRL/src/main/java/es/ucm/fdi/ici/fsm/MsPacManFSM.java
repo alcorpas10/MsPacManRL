@@ -10,7 +10,7 @@ import pacman.game.Game;
 
 /**
  * Class that implements the FSM. 
- * It has two mspacman with different behaviours that change if its necessary using the transitions.
+ * It has two mspacman with different behaviors that change if its necessary using the transitions.
  */
 public class MsPacManFSM extends PacmanController {
 
