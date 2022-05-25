@@ -8,7 +8,7 @@ import pacman.game.Constants.MOVE;
 import pacman.game.Game;
 
 /**
- * Ghosts whose behavior is always a random action.
+ * Ghosts whose behavior is always random.
  */
 public final class GhostRandom extends GhostController {
 	private EnumMap<GHOST, MOVE> moves = new EnumMap<GHOST, MOVE>(GHOST.class);
