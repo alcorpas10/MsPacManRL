@@ -1,7 +1,9 @@
 package FSM;
 
 import es.ucm.fdi.ici.Input;
-
+/**
+ * Transiton to only pills.
+ */
 public class PillTransition implements Transition {
 	String id;
 	
