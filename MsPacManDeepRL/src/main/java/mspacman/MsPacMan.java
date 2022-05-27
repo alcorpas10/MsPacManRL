@@ -39,7 +39,7 @@ public class MsPacMan extends PacmanController implements Action {
 	private int lastLives;
 
 	/**
-	 * @param type 0: General; 1: Not Edible; 2: Edible
+	 * @param type 0: General; 1: Not Edible & Edible Long state; 2: Edible Short State
 	 */
 	public MsPacMan(Socket socket, String name, int type) {
 		this.name = name;
