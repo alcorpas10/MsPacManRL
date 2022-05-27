@@ -9,7 +9,7 @@ import mspacman.ExecutorDeepLearn;
 import mspacman.MsPacMan;
 
 /**
- * Class that trains the edible model a number of episodes with the 
+ * Class that trains the edible model a number of episodes
  */
 public class MainTrainEdible {
 	public static void main(String[] args) {
