@@ -1,4 +1,4 @@
-package PacMans;
+package mspacmans;
 import java.util.HashSet;
 import java.util.Set;
 

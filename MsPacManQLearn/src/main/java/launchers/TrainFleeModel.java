@@ -1,19 +1,19 @@
-package Launcher;
+package launchers;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import Others.Executor;
-import Others.GhostAggressive;
-import Others.GhostAlgorithmic;
-import Others.GhostRandom;
 import chen0040.rl.learning.qlearn.QLearner;
+import ghosts.GhostAggressive;
+import ghosts.GhostAlgorithmic;
+import ghosts.GhostRandom;
+import mspacmans.Executor;
 import pacman.controllers.GhostController;
 
 /**
- * Class that trains the pills model a number of episodes
+ * Class that trains the flee model a number of episodes
  */
-public class TrainPillsModel {
+public class TrainFleeModel {
 	public static void main(String[] args) {
 		//Class that executes the game
 		Executor executor = new Executor.Builder()
@@ -22,11 +22,11 @@ public class TrainPillsModel {
 				.setScaleFactor(3.0)
 				.build();
 		
-		GhostController ghosts = new GhostAlgorithmic(); //The ghosts that we want to play against
-		QLearner model = executor.runGameQtrainPills(ghosts, Integer.parseInt(args[1])); //Trains the model a number of episodes (second argument )
+		GhostController ghosts = new GhostAggressive(); 		//The ghosts that we want to play against
+		QLearner model = executor.runGameQtrainFlee(ghosts, Integer.parseInt(args[1]));  	//Trains the model a number of episodes (second argument )
 		
 		//Exports model in a json
-		try(PrintStream ps = new PrintStream(args[0])){  //name given in the first argument from the command line
+		try(PrintStream ps = new PrintStream(args[0])){ 	//name given in the first argument from the command line
             ps.println(model.toJson());
             ps.flush();
             ps.close();

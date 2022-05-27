@@ -1,4 +1,4 @@
-package PacMans;
+package mspacmans;
 
 import es.ucm.fdi.ici.Action;
 import pacman.game.Constants.MOVE;

@@ -1,4 +1,4 @@
-package Others;
+package ghosts;
 
 import java.util.EnumMap;
 

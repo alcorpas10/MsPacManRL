@@ -1,13 +1,13 @@
-package Launcher;
+package launchers;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import Others.Executor;
-import Others.GhostAggressive;
-import Others.GhostAlgorithmic;
-import Others.GhostRandom;
 import chen0040.rl.learning.qlearn.QLearner;
+import ghosts.GhostAggressive;
+import ghosts.GhostAlgorithmic;
+import ghosts.GhostRandom;
+import mspacmans.Executor;
 import pacman.controllers.GhostController;
 
 /**

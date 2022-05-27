@@ -1,8 +1,8 @@
-package Launcher;
+package launchers;
 
-import Others.Executor;
-import Others.GhostAggressive;
 import chen0040.rl.learning.qlearn.QLearner;
+import ghosts.GhostAggressive;
+import mspacmans.Executor;
 import pacman.controllers.GhostController;
 
 /**

@@ -8,13 +8,13 @@ import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import PacMans.QPacMan;
-import PacMans.QPacManChase;
-import PacMans.QPacManFlee;
-import PacMans.QPacManOriginal;
-import PacMans.QPacManPills;
 import chen0040.rl.learning.qlearn.QLearner;
 import es.ucm.fdi.ici.Input;
+import mspacmans.QPacMan;
+import mspacmans.QPacManChase;
+import mspacmans.QPacManFlee;
+import mspacmans.QPacManOriginal;
+import mspacmans.QPacManPills;
 import pacman.controllers.PacmanController;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;

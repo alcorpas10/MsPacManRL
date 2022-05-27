@@ -1,4 +1,4 @@
-package Others;
+package mspacmans;
 import static pacman.game.Constants.DELAY;
 import static pacman.game.Constants.INTERVAL_WAIT;
 
@@ -28,11 +28,6 @@ import pacman.game.comms.BasicMessenger;
 import pacman.game.comms.Messenger;
 import pacman.game.internal.POType;
 import pacman.game.util.Stats;
-import PacMans.QPacMan;
-import PacMans.QPacManChase;
-import PacMans.QPacManFlee;
-import PacMans.QPacManOriginal;
-import PacMans.QPacManPills;
 import Utils.QConstants;
 import chen0040.rl.learning.qlearn.QLearner;
 

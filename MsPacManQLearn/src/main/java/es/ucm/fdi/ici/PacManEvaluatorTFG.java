@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.Vector;
 
-import Others.Executor;
+import mspacmans.Executor;
 import pacman.controllers.Controller;
 import pacman.controllers.GhostController;
 import pacman.controllers.PacmanController;

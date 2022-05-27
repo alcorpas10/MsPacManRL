@@ -1,7 +1,7 @@
-package Launcher;
+package launchers;
 
-import Others.Executor;
-import Others.GhostRandom;
+import ghosts.GhostRandom;
+import mspacmans.Executor;
 import pacman.controllers.GhostController;
 
 /**

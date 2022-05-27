@@ -1,4 +1,4 @@
-package Launcher;
+package launchers;
 
 import es.ucm.fdi.ici.PacManEvaluatorTFG;
 import es.ucm.fdi.ici.Scores;

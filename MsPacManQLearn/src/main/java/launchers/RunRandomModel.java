@@ -1,13 +1,12 @@
-package Launcher;
+package launchers;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-
-import Others.Executor;
-import Others.GhostRandom;
 import chen0040.rl.learning.qlearn.QLearner;
+import ghosts.GhostRandom;
+import mspacmans.Executor;
 import pacman.controllers.GhostController;
 
 /**
