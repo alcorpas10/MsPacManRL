@@ -22,8 +22,8 @@ public class MainTrainEdible {
 
 		try {
 			Socket socket = new Socket("localhost", Integer.parseInt(args[0])); //Socket that connects with python at the given port in the first argument
-
-			MsPacMan pacMan = new MsPacMan(socket, "", 0); //MsPacMan that receives its actions from the socket
+			//MsPacMan that receives its actions from the socket
+			MsPacMan pacMan = new MsPacMan(socket, "", 1);  //If you want the short state change the 1 from the third argument to 2
 			GhostController ghosts = new GhostNormal();   //The ghosts that we want to play against
 
 			System.out.println(executor.runEpisodesTrainEdible(pacMan, ghosts, "Deep Learn")); //Trains the model a number of episodes 

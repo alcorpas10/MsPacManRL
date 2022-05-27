@@ -107,7 +107,7 @@ public class MsPacMan extends PacmanController implements Action {
 			output = distPills + "/" + distPowerPills + "/" + distGhosts + "/" + edibleGhosts + ";"; 
 		}
 		// Not Edible state and long Edible state
-		else if (type == 1 || type == 2) {
+		else if (type == 1) {
 			List<Integer> distPills = getDistanceToNearestPills(msPacManNode);
 			List<Integer> distPowerPills = getDistanceToNearestPowerPills(msPacManNode);
 
