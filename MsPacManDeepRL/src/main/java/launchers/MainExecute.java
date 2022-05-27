@@ -22,8 +22,8 @@ public class MainExecute {
 		
 		try {
 			Socket socket = new Socket("localhost", 38514);  //Socket that connects with python at the given port
-			
-			MsPacMan pacMan = new MsPacMan(socket, "", 2);  //MsPacMan that receives its actions from the socket
+			//MsPacMan that receives its actions from the socket
+			MsPacMan pacMan = new MsPacMan(socket, "", 0);   
 	        GhostController ghosts = new GhostNormal();		//The ghosts that we want to play against
 	        
 	        System.out.println(executor.runGame(pacMan, ghosts, 40));  //Shows and runs the game 
