@@ -4,6 +4,7 @@ Implementation of reinforcement learning techniques in the behaviour of a MsPacM
 
 ## MsPacManQLearn
 Implementation of q-learning in the behaviour of a MsPacMan AI.
+
 ### Train
 * TrainChaseModel: class that trains the chase model.  
   * Params: model name, number of episodes.  
@@ -16,28 +17,19 @@ Implementation of q-learning in the behaviour of a MsPacMan AI.
 * LoadAndTrainModel: class that loads a model that has been trained and trains it more.
   * Params: model name of the exisiting model, number of episodes.
 
-### Evaluation
-* Evaluate: class that evalutes the model.  
-
-
 ### Run model
 * MainQ: class that trains a model and runs it.  
 * RunFsmModel: class that runs the game with a fsm.  
 * RunRandomModel: class that loads an original model and runs it in a randomly intialized game. 
   * Params: model name.
 
+### Evaluation
+* Evaluate: class that evalutes the model following the settings of *config.properties*.
+
+
 ## MsPacManDeepRL
 Implementation of deep reinforcement learning in the behaviour of a MsPacMan AI.  
 In every train, evaluate or run game you have to run both python server and java server.  
-
-### Evaluation
-#### Java
-* Evaluate: class that evalutes the model.    
-#### Python
-* LoadMsPacManEvaluate: class that evaluates the general model.      
-  * Params: model file's name, port.    
-* LoadMsPacManEvaluateFSM: class that evaluates the fsm. It has to be run two times. One for an edible model with long state and one for a not edible model.   
-  * Params: model file's name, number of different type of ghosts, number of episodes, port.
 
 ### Train
 #### Java
@@ -68,3 +60,13 @@ In every train, evaluate or run game you have to run both python server and java
   * Params: model file's name, port. 
 * LoadMsPacManLongState: class that loads and runs the not edible model and the edible model with long state.  
   * Params: model file's name, port.
+
+### Evaluation
+#### Java
+* Evaluate: class that evalutes the model following the settings of *config.properties*.    
+#### Python
+* LoadMsPacManEvaluate: class that evaluates the general model.      
+  * Params: model file's name, port.    
+* LoadMsPacManEvaluateFSM: class that evaluates the fsm. It has to be run two times. One for an edible model with long state and one for a not edible model.   
+  * Params: model file's name, number of different type of ghosts, number of episodes, port.
+
