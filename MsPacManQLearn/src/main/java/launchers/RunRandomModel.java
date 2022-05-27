@@ -10,7 +10,7 @@ import mspacmans.Executor;
 import pacman.controllers.GhostController;
 
 /**
- * Class that runs a loaded random model (json)
+ * Class that runs a loaded original model (json) in a randomly initialized game.
  */
 public class RunRandomModel {
 public static void main(String[] args) {

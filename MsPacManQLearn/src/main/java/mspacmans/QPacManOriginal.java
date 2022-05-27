@@ -14,7 +14,7 @@ import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 
 /**
- * Class that implements an algorithmic behaviour of mspacman 
+ * Class that implements an algorithmic behavior of mspacman 
  */
 
 public class QPacManOriginal extends QPacMan{
