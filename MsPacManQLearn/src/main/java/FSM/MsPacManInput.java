@@ -14,7 +14,6 @@ public class MsPacManInput extends Input {
 	private boolean pills;
 	private boolean chase;
 	private boolean flee;
-	private boolean general;
 	
 	
 	public MsPacManInput(Game game) {
@@ -22,12 +21,11 @@ public class MsPacManInput extends Input {
 		pills=false;
 		chase=false;
 		flee=false;
-		general=false;
 
 		//Looks to the nearest ghost and updates the variables
 		GHOST g = getNearestGhost(game.getPacmanCurrentNodeIndex(), game.getPacmanLastMoveMade());
 		if(g==null) {  //if the ghost is in the lair
-			general=true;
+			pills=true;
 		}
 		else if(game.isGhostEdible(g)) {  //if ghost is edible
 			chase=true;
@@ -81,9 +79,6 @@ public class MsPacManInput extends Input {
 	}
 	public boolean flee() {
 		return flee;
-	}
-	public boolean general() {
-		return general;
 	}
 	
 }

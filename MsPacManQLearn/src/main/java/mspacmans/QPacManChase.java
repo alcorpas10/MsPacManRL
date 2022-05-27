@@ -19,7 +19,7 @@ public class QPacManChase extends QPacMan {
     private int lastJunctionState;
     private int nextState;
     // -10:mspacman eaten, 1 ghost eaten
-    private final int[] REWARD = {-10, 1};
+    private final int[] REWARD = {-100, -1, 50};
 
 
     public QPacManChase(QLearner learner) {
@@ -38,7 +38,7 @@ public class QPacManChase extends QPacMan {
 		//Ghosts info
 		GHOST ghost = getNearestGhost(msPacManNode, msPacManMove);
 		boolean edible = false;
-		int distanceGhost = 3;
+		int distanceGhost = 9;
 		MOVE directionGhost = MOVE.UP;
 		
 		
@@ -57,14 +57,26 @@ public class QPacManChase extends QPacMan {
 			}
 			
 			//discretize distance to ghosts
-			if(distanceGhost <= 20 )
+			if(distanceGhost <= 5 )
 				distanceGhost = 0;
-			else if(distanceGhost <= 50)
+			else if(distanceGhost <= 10)
 				distanceGhost = 1;
-			else if(distanceGhost <= 90)
+			else if(distanceGhost <= 20)
 				distanceGhost = 2;
-			else
+			else if(distanceGhost <= 30)
 				distanceGhost = 3;
+			else if(distanceGhost <= 40)
+				distanceGhost = 4;
+			else if(distanceGhost <= 60)
+				distanceGhost = 5;
+			else if(distanceGhost <= 80)
+				distanceGhost = 6;
+			else if(distanceGhost <= 100)
+				distanceGhost = 7;
+			else if(distanceGhost <= 150)
+				distanceGhost = 8;
+			else
+				distanceGhost = 9;
 		}
 		// Next state is updated
     	calculateState(distanceGhost, directionGhost);
@@ -126,7 +138,7 @@ public class QPacManChase extends QPacMan {
     	
     	
     	GHOST ghost = null;
-    	int distanceGhost = 3;
+    	int distanceGhost = 9;
     	int ghostNode = -1;
     	
 		int reward;
@@ -141,9 +153,9 @@ public class QPacManChase extends QPacMan {
     	if (game.wasPacManEaten())
     		reward = REWARD[0];
     	else if (eatenGhost)
-    		reward = REWARD[1];
+    		reward = REWARD[2];
     	else
-    		reward = 0;
+    		reward = REWARD[1];
     	
     	// MsPacMan info
     	msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -170,14 +182,26 @@ public class QPacManChase extends QPacMan {
 			}
 			
 			//discretize distance to ghost
-			if(distanceGhost <= 20 )
+			if(distanceGhost <= 5 )
 				distanceGhost = 0;
-			else if(distanceGhost <= 50)
+			else if(distanceGhost <= 10)
 				distanceGhost = 1;
-			else if(distanceGhost <= 90)
+			else if(distanceGhost <= 20)
 				distanceGhost = 2;
-			else
+			else if(distanceGhost <= 30)
 				distanceGhost = 3;
+			else if(distanceGhost <= 40)
+				distanceGhost = 4;
+			else if(distanceGhost <= 60)
+				distanceGhost = 5;
+			else if(distanceGhost <= 80)
+				distanceGhost = 6;
+			else if(distanceGhost <= 100)
+				distanceGhost = 7;
+			else if(distanceGhost <= 150)
+				distanceGhost = 8;
+			else
+				distanceGhost = 9;
 		}
    
 		// Attributes are updated	

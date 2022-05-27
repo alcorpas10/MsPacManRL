@@ -26,7 +26,6 @@ import pacman.game.Game;
 public class MsPacMan extends PacmanController {
 
 	FSM fsm;
-	QPacMan qPacManGeneral;  //MsPacman that has trained the algorithmic behavior
 	QPacMan qPacManFlee;	//MsPacman that has trained to flee from ghosts
 	QPacMan qPacManPills;	//MsPacman that has trained to eat pills
 	QPacMan qPacManChase;  	//MsPacman that has trained to chase ghosts
@@ -34,7 +33,9 @@ public class MsPacMan extends PacmanController {
 	public MsPacMan(Game game, int numTrainings, String ghostType) {
 		fsm = new FSM("MsPacMan");
 		
-	
+		/*GraphFSMObserver observer = new GraphFSMObserver(fsm.toString()); //Code for visual fsm representation
+    	fsm.addObserver(observer);*/
+    	
     	//Load from json the flee model
     	StringBuilder contentBuilder1 = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader("FleeModel" + ghostType + numTrainings+".json"))) {
@@ -71,48 +72,39 @@ public class MsPacMan extends PacmanController {
             e.printStackTrace();
         }
     	
-        //Load the qlearners with theri respective model
-    	qPacManGeneral = new QPacManOriginal(new QLearner(13333, 4));   
+        //Load the qlearners with theri respective model  
     	qPacManFlee = new QPacManFlee(QLearner.fromJson(contentBuilder1.toString()));
     	qPacManPills = new QPacManPills(QLearner.fromJson(contentBuilder2.toString()));
     	qPacManChase = new QPacManChase(QLearner.fromJson(contentBuilder3.toString()));
     	
     	
     	//Initialize the games in all the mspacmans
-    	qPacManGeneral.setNewGame(game);
 		qPacManFlee.setNewGame(game);
 		qPacManPills.setNewGame(game);
 		qPacManChase.setNewGame(game);
 		
 		
 		//States of the fsm
-    	SimpleState generalState = new SimpleState("generalState", qPacManGeneral);
     	SimpleState pillsState = new SimpleState("pillsState", qPacManFlee);
     	SimpleState chaseGhostState = new SimpleState("chaseGhostState", qPacManPills);
     	SimpleState fleeGhostState = new SimpleState("fleeGhostState", qPacManChase);
     	
     	
     	//Add the states with their respective transitions to the other states
-    	fsm.add(generalState, new ChaseTransition("general"), chaseGhostState);
-    	fsm.add(generalState, new FleeTransition("general"), fleeGhostState);
-    	fsm.add(generalState, new PillTransition("general"), pillsState);
     	
     	fsm.add(pillsState, new ChaseTransition("pills"), chaseGhostState);
     	fsm.add(pillsState, new FleeTransition("pills"), fleeGhostState);
-    	fsm.add(pillsState, new GeneralTransition("pills"), generalState);
     	
     	fsm.add(chaseGhostState, new PillTransition("chase"), pillsState );
      	fsm.add(chaseGhostState, new FleeTransition("chase"), fleeGhostState );
-     	fsm.add(chaseGhostState, new GeneralTransition("chase"), generalState );
-     	
-    	fsm.add(fleeGhostState, new GeneralTransition("flee"), generalState);    	
+     	  	
     	fsm.add(fleeGhostState, new PillTransition("flee"), pillsState);
     	fsm.add(fleeGhostState, new ChaseTransition("flee"), chaseGhostState);
     	
-    	fsm.ready(generalState);
+    	fsm.ready(pillsState);
     	
     	
-    	//Show the fsm 
+    	//Show the visual fsm representation 
     	/*JFrame frame = new JFrame();
     	JPanel main = new JPanel();
     	main.setLayout(new BorderLayout());
@@ -140,8 +132,7 @@ public class MsPacMan extends PacmanController {
        	
        	MOVE m=fsm.run(in);  //gets the move
        	
-       	//updates the stategy
-       	qPacManGeneral.updateStrategy();  
+       	//updates the stategy  
        	qPacManFlee.updateStrategy();  
        	qPacManChase.updateStrategy();  
        	qPacManPills.updateStrategy();  

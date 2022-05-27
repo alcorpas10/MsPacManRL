@@ -127,14 +127,26 @@ public class QPacManPills extends QPacMan {
      * Method that discretize the distance to a pill
      */
     private int discretizePillDistance(int distance) {
-		if(distance <= 15)
-			return 0;
-		else if(distance <= 35)
+    	if(distance <= 5 )
+    		return 0;
+		else if(distance <= 10)
 			return 1;
-		else if(distance <= 60)
+		else if(distance <= 20)
 			return 2;
-		else
+		else if(distance <= 30)
 			return 3;
+		else if(distance <= 40)
+			return 4;
+		else if(distance <= 60)
+			return 5;
+		else if(distance <= 80)
+			return 6;
+		else if(distance <= 100)
+			return 7;
+		else if(distance <= 150)
+			return 8;
+		else
+			return 9;
     }
     
     /**

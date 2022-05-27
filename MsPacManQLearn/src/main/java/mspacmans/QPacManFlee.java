@@ -24,7 +24,7 @@ public class QPacManFlee extends QPacMan{
     private int nextState;
 
     //-1000:mspacman eaten, 1 rest
-    private final int[] REWARD = {-1000, 1};
+    private final int[] REWARD = {-1000, 10, 1};
 
     public QPacManFlee(QLearner learner) {
 		this.agent = learner;
@@ -47,7 +47,7 @@ public class QPacManFlee extends QPacMan{
 		//Ghosts info
 		GHOST ghost = getNearestGhost(msPacManNode, msPacManMove);
 		boolean edible = false;
-		int distanceGhost = 4;
+		int distanceGhost = 9;
 		MOVE directionGhost = MOVE.UP, directionPill = game.getNextMoveTowardsTarget(msPacManNode, pillNode, msPacManMove, DM.PATH);;
 		
 		
@@ -66,28 +66,14 @@ public class QPacManFlee extends QPacMan{
 			}
 			
 			//discretize distance to ghosts
-			if(distanceGhost <= 20 )
-				distanceGhost = 0;
-			else if(distanceGhost <= 50)
-				distanceGhost = 1;
-			else if(distanceGhost <= 90)
-				distanceGhost = 2;
-			else
-				distanceGhost = 3;
+			distanceGhost = discretizeDistance(distanceGhost);
 		}
 		
 		//discretize distance to pills
-		if(distancePill <= 20 && distancePill >= 0)
-			distancePill = 0;
-		else if(distancePill <= 50)
-			distancePill = 1;
-		else if(distancePill <= 90)
-			distancePill = 2;
-		else
-			distancePill = 3;
+		distancePill = discretizeDistance(distancePill);
 		
 		// Next state is updated
-    	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
+    	calculateState(distanceGhost, distancePill, directionGhost, directionPill);
     	
     	this.lastJunctionState = this.nextState;
     }
@@ -131,8 +117,31 @@ public class QPacManFlee extends QPacMan{
     /**
      * Method that calculate the state using the distance to the nearest ghost and the direction
      */
-    private void calculateState(int distanceGhost, int distancePill, boolean edible, MOVE directionGhost, MOVE directionPill) {
-    	this.nextState = directionGhost.ordinal()*10  + distanceGhost;
+    private void calculateState(int distanceGhost, int distancePill, MOVE directionGhost, MOVE directionPill) {
+    	this.nextState = directionGhost.ordinal()*1000  + directionGhost.ordinal()*100 + distanceGhost * 10 + distancePill;
+    }
+    
+    private int discretizeDistance(int distance) {
+    	if(distance <= 5 )
+    		return 0;
+		else if(distance <= 10)
+			return 1;
+		else if(distance <= 20)
+			return 2;
+		else if(distance <= 30)
+			return 3;
+		else if(distance <= 40)
+			return 4;
+		else if(distance <= 60)
+			return 5;
+		else if(distance <= 80)
+			return 6;
+		else if(distance <= 100)
+			return 7;
+		else if(distance <= 150)
+			return 8;
+		else
+			return 9;
     }
     
     /**
@@ -142,17 +151,19 @@ public class QPacManFlee extends QPacMan{
     	int msPacManNode = -1;
     	MOVE msPacManMove = null;
     	int pillNode = -1;
-    	int distancePill = -1;
+    	int distancePill = 9;
     	GHOST ghost = null;
-    	int distanceGhost = -1;
+    	int distanceGhost = 9;
     	int ghostNode = -1;
     	try {
     		int reward;
         	
-        	if (game.wasPacManEaten())
+    		if (game.wasPacManEaten())
         		reward = REWARD[0];
-        	else
+        	else if(game.wasPillEaten())
         		reward = REWARD[1];
+        	else
+        		reward = REWARD[2];
         	
         	//mspacman info
         	msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -182,31 +193,16 @@ public class QPacManFlee extends QPacMan{
     				directionGhost = game.getNextMoveTowardsTarget(ghostNode, msPacManNode, game.getGhostLastMoveMade(ghost), DM.PATH);
     			}
     			//discretize distance to ghost
-    			if(distanceGhost <= 20 )
-    				distanceGhost = 0;
-    			else if(distanceGhost <= 50)
-    				distanceGhost = 1;
-    			else if(distanceGhost <= 90)
-    				distanceGhost = 2;
-    			else
-    				distanceGhost = 3;
+    			distanceGhost = discretizeDistance(distanceGhost);
     		}
     		
-    		//discretize distance to pill
-    		if(distancePill <= 20 && distancePill >= 0)
-    			distancePill = 0;
-    		else if(distancePill <= 50)
-    			distancePill = 1;
-    		else if(distancePill <= 90)
-    			distancePill = 2;
-    		else
-    			distancePill = 3;
+    		distancePill = discretizeDistance(distancePill);
     		
     		//Attributes are updated
     		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
     			this.lastJunctionState = this.nextState;
     		
-        	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
+        	calculateState(distanceGhost, distancePill, directionGhost, directionPill);
         	
         	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
     	} catch(Exception e) {

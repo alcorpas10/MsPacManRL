@@ -709,7 +709,7 @@ public class Executor {
     public QLearner runGameQtrainPills(GhostController ghostController, int partidas) {
         Game game = setupPillsGame();
         MOVE actMove;
-        QLearner learner = new QLearner(33, QConstants.numMoves);
+        QLearner learner = new QLearner(40, QConstants.numMoves);
         QPacMan qPacMan = new QPacManPills(learner);
         qPacMan.setNewGame(game);
 
@@ -748,7 +748,7 @@ public class Executor {
     public QLearner runGameQtrainFlee(GhostController ghostController, int partidas) {
         Game game = setupFleeGame();
         MOVE actMove;
-        QLearner learner = new QLearner(33, QConstants.numMoves);
+        QLearner learner = new QLearner(3400, QConstants.numMoves);
         QPacMan qPacMan = new QPacManFlee(learner);
         qPacMan.setNewGame(game);
 
@@ -787,7 +787,7 @@ public class Executor {
     public QLearner runGameQtrainChase(GhostController ghostController, int partidas) {
         Game game = setupChaseGame();
         MOVE actMove;
-        QLearner learner = new QLearner(33, QConstants.numMoves); //3: direction Ghost , 3: Distance ghost
+        QLearner learner = new QLearner(40, QConstants.numMoves); //3: direction Ghost , 3: Distance ghost
         QPacMan qPacMan = new QPacManChase(learner);
         qPacMan.setNewGame(game);
 
