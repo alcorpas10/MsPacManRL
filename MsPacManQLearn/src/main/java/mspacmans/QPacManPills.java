@@ -27,6 +27,8 @@ public class QPacManPills extends QPacMan {
     private final int[] REWARD = {10, 1, -5};
     
     private final double[] MULTIPLIER = {5, 3, 2, 1.5, 1};
+    private int reward = 0;
+
 
     // State codification: directionPill, distancePill : Max number -> 33
     
@@ -160,7 +162,6 @@ public class QPacManPills extends QPacMan {
     	int distancePill = -1;
     	MOVE directionPill = MOVE.NEUTRAL;
     	try {
-    		int reward;
         	
     		// MsPacMan info
     		msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -177,20 +178,20 @@ public class QPacManPills extends QPacMan {
     		
     		// Reward calculation
     		if (game.wasPillEaten())
-        		reward = (int) (REWARD[0] * MULTIPLIER[pillsNumber]);
+        		reward += (int) (REWARD[0] * MULTIPLIER[pillsNumber]);
     		else if (distancePill <= this.lastPillDistance)
-    			reward = REWARD[1];
+    			reward += REWARD[1];
         	else
-        		reward = REWARD[2];
+        		reward += REWARD[2];
     		        	
-    		// Attributes are updated
-        	calculateState(pillsNumber, directionPill, distancePill);
-
-        	this.lastPillDistance = distancePill;
-    		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
-    			this.lastJunctionState = this.nextState;
+        	calculateState(pillsNumber, directionPill, distancePill);      	
         	
-        	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
+    		// Attributes are updated	
+    		if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+    			agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);  //update agent
+        		reward = 0;
+    			this.lastJunctionState = this.nextState;
+    		}
     	} catch(Exception e) {
     		e.printStackTrace();
     		System.out.println("MsNode:    " + msPacManNode);

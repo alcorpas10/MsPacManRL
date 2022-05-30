@@ -22,7 +22,7 @@ public class TrainFleeModel {
 				.setScaleFactor(3.0)
 				.build();
 		
-		GhostController ghosts = new GhostAggressive(); 		//The ghosts that we want to play against
+		GhostController ghosts = new GhostAlgorithmic(); 		//The ghosts that we want to play against
 		QLearner model = executor.runGameQtrainFlee(ghosts, Integer.parseInt(args[1]));  	//Trains the model a number of episodes (second argument )
 		
 		//Exports model in a json

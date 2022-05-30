@@ -1,5 +1,6 @@
 package launchers;
 
+import ghosts.GhostAlgorithmic;
 import ghosts.GhostRandom;
 import mspacmans.Executor;
 import pacman.controllers.GhostController;
@@ -16,7 +17,7 @@ public class RunFsmModel {
 				.setScaleFactor(3.0)
 				.build();
 		
-		GhostController ghosts = new GhostRandom(); 	//The ghosts that we want to play against
+		GhostController ghosts = new GhostAlgorithmic(); 	//The ghosts that we want to play against
 		
 
 		System.out.println(executor.runGameFSM(ghosts, 40)); //Runs and shows the game executing the FSM

@@ -20,6 +20,7 @@ public class QPacManChase extends QPacMan {
     private int nextState;
     // -10:mspacman eaten, 1 ghost eaten
     private final int[] REWARD = {-100, -1, 50};
+    private int reward = 0;
 
 
     public QPacManChase(QLearner learner) {
@@ -141,7 +142,7 @@ public class QPacManChase extends QPacMan {
     	int distanceGhost = 9;
     	int ghostNode = -1;
     	
-		int reward;
+		
     	boolean eatenGhost = false;
     	for (GHOST g: GHOST.values()) {
     		if (game.wasGhostEaten(g)) {
@@ -151,11 +152,11 @@ public class QPacManChase extends QPacMan {
     	}
 		// Reward calculation	
     	if (game.wasPacManEaten())
-    		reward = REWARD[0];
+    		reward += REWARD[0];
     	else if (eatenGhost)
-    		reward = REWARD[2];
+    		reward += REWARD[2];
     	else
-    		reward = REWARD[1];
+    		reward += REWARD[1];
     	
     	// MsPacMan info
     	msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -203,14 +204,16 @@ public class QPacManChase extends QPacMan {
 			else
 				distanceGhost = 9;
 		}
+		
+		calculateState(distanceGhost, directionGhost);  //get state
    
 		// Attributes are updated	
-		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
-		this.lastJunctionState = this.nextState;
-		
-    	calculateState(distanceGhost, directionGhost);  //get state
-    	
-        agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);  //update agent
+		if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+			agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);  //update agent
+    		reward = 0;
+			this.lastJunctionState = this.nextState;
+		}
+        
     }
     
     /**

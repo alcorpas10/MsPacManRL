@@ -25,6 +25,7 @@ public class QPacManFlee extends QPacMan{
 
     //-1000:mspacman eaten, 1 rest
     private final int[] REWARD = {-1000, 10, 1};
+    private int reward = 0;
 
     public QPacManFlee(QLearner learner) {
 		this.agent = learner;
@@ -156,14 +157,14 @@ public class QPacManFlee extends QPacMan{
     	int distanceGhost = 9;
     	int ghostNode = -1;
     	try {
-    		int reward;
+    		
         	
     		if (game.wasPacManEaten())
-        		reward = REWARD[0];
+        		reward += REWARD[0];
         	else if(game.wasPillEaten())
-        		reward = REWARD[1];
+        		reward += REWARD[1];
         	else
-        		reward = REWARD[2];
+        		reward += REWARD[2];
         	
         	//mspacman info
         	msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -197,14 +198,15 @@ public class QPacManFlee extends QPacMan{
     		}
     		
     		distancePill = discretizeDistance(distancePill);
-    		
-    		//Attributes are updated
-    		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
-    			this.lastJunctionState = this.nextState;
-    		
+   		
         	calculateState(distanceGhost, distancePill, directionGhost, directionPill);
-        	
-        	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
+     	   
+    		// Attributes are updated	
+    		if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+    			agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);  //update agent
+        		reward = 0;
+    			this.lastJunctionState = this.nextState;
+    		}
     	} catch(Exception e) {
     		System.out.println("MsNode: " + msPacManNode);
     		System.out.println("MsMove: " + msPacManMove);
