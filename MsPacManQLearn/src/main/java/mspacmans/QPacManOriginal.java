@@ -23,6 +23,7 @@ public class QPacManOriginal extends QPacMan{
     private MOVE lastJunctionMove;
     private int lastJunctionState;
     private int nextState;
+    private int reward = 0;
 
     private final int[] REWARD = {1000, -100, -1000000, 100000};
 
@@ -152,7 +153,6 @@ public class QPacManOriginal extends QPacMan{
     	int distanceGhost = -1;
     	int ghostNode = -1;
     	try {
-    		int reward;
         	boolean eatenGhost = false;
         	for (GHOST g: GHOST.values()) {
         		if (game.wasGhostEaten(g)) {
@@ -162,13 +162,13 @@ public class QPacManOriginal extends QPacMan{
         	}
         	//reward
         	if (game.wasPacManEaten())
-        		reward = REWARD[2];
+        		reward += REWARD[2];
         	else if (eatenGhost)
-        		reward = REWARD[3];
+        		reward += REWARD[3];
         	else if (game.wasPillEaten())
-        		reward = REWARD[0];
+        		reward += REWARD[0];
         	else
-        		reward = REWARD[1];
+        		reward += REWARD[1];
         	
         	//mspacman info
         	msPacManNode = game.getPacmanCurrentNodeIndex();
@@ -219,13 +219,14 @@ public class QPacManOriginal extends QPacMan{
     		else
     			distancePill = 3;
     		
-    		//Attributes are updated
-    		if(game.isJunction(game.getPacmanCurrentNodeIndex()))
+    		calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);  //get state    		
+       
+    		// Attributes are updated	
+    		if(game.isJunction(game.getPacmanCurrentNodeIndex())) {
+    			agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);  //update agent
+        		reward = 0;
     			this.lastJunctionState = this.nextState;
-    		
-        	calculateState(distanceGhost, distancePill, edible, directionGhost, directionPill);
-        	
-        	agent.update(this.lastJunctionState, this.lastJunctionMove.ordinal(), this.nextState, QConstants.actions, reward);
+    		}
     	} catch(Exception e) {
     		System.out.println("MsNode: " + msPacManNode);
     		System.out.println("MsMove: " + msPacManMove);

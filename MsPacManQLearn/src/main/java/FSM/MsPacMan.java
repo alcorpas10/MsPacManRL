@@ -38,7 +38,7 @@ public class MsPacMan extends PacmanController {
     	
     	//Load from json the flee model
     	StringBuilder contentBuilder1 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("FinalFlee1000000.json"))) {//(new FileReader("FleeModel" + ghostType + numTrainings+".json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("FleeModel.json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder1.append(sCurrentLine).append("\n");
@@ -50,7 +50,7 @@ public class MsPacMan extends PacmanController {
         
         //Load from json the pills model
         StringBuilder contentBuilder2 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("FinalPills.json"))) { // (new FileReader("PillsModel" + ghostType + numTrainings+".json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("PillsModel.json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder2.append(sCurrentLine).append("\n");
@@ -62,7 +62,7 @@ public class MsPacMan extends PacmanController {
         
         //Load from json the chase model
         StringBuilder contentBuilder3 = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader("FinalChase1000000.json"))) {//(new FileReader("ChaseModel" + ghostType + numTrainings+".json"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("ChaseModel.json"))) {
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 contentBuilder3.append(sCurrentLine).append("\n");
