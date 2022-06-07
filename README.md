@@ -1,9 +1,10 @@
 # MsPacManRL
-Implementation of reinforcement learning techniques in the behaviour of a MsPacMan AI.  
+Implementation of reinforcement learning techniques for behavioral learning in the game MsPacMan Vs. Ghosts.
+
 <img src="https://user-images.githubusercontent.com/60663710/170696442-634389db-e182-480f-861b-56fc7eaaf0e2.png" alt="MsPacMan" width="350"/>
 
 ## MsPacManQLearn
-Implementation of q-learning in the behaviour of a MsPacMan AI.
+Implementation of Q-Learning for the MsPacMan behavior learning.
 
 ### Train
 * TrainChaseModel: class that trains the chase model.  
@@ -28,7 +29,7 @@ Implementation of q-learning in the behaviour of a MsPacMan AI.
 
 
 ## MsPacManDeepRL
-Implementation of deep reinforcement learning in the behaviour of a MsPacMan AI.  
+Implementation of Deep Reinforcement Learning for the MsPacMan behavior learning.  
 In every train, evaluate or run game you have to run both python server and java server.  
 
 ### Train
